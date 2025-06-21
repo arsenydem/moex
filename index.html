@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<title>Финуслуги — макет (full)</title>
+<title>Финуслуги — макет</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
@@ -20,6 +20,9 @@ html, body{
   overflow-y:auto;     /* обязательно, иначе скролла нет */
 }
 
+#ban::placeholder {
+    font-size:12px
+}
 .storyes {
     border-radius: 50%
 }
@@ -44,10 +47,6 @@ a{text-decoration:none;color:inherit}
 
 
 /* -------- HEADER -------- */
-header{
-  grid-column:1/-1;background:var(--header-bg);
-  padding:20px 36px;display:flex;align-items:center;gap:32px;
-}
 .logo-ph{width:120px;height:32px;border-radius:4px}
 .greeting{font-size:30px;font-weight:600;flex:1;margin-left:120px}
 .m-layout-header-level-icon {
@@ -56,6 +55,54 @@ header{
 .hfnsknk {
     transform: rotate(90deg)
 }
+/* ---------- базовый (десктопный) вид никак не трогаем ---------- */
+header{
+  grid-column:1/-1;
+  background:var(--header-bg);
+  padding:20px 36px;
+  display:flex;
+  align-items:center;
+  gap:32px;
+
+  /* добавили: разрешаем перенос строк */
+  flex-wrap:wrap;
+}
+
+/* порядок элементов на широком экране                ─┬──┬──┬──┐
+   1) logo-ph | 2) greeting | 3) badge | 4) user-box   │  │  │  │ */
+.logo-ph  {order:1;}
+.greeting {order:2; flex:1;}     /* занимает всё свободное */
+.badge    {order:3;}
+.user-box {order:4;}
+
+/* ---------- мобильный брейк-пойнт ---------- */
+@media (max-width:600px){
+  /* хотим: logo-ph  .............  user-box   (первая строка)
+            Привет! 👋                         (вторая)
+            Начальный уровень                 (третья)          */
+
+  .user-box {order:2; margin-left:auto;} /* стоит справа в первой строке */
+
+  .greeting{
+    order:3;                 /* уходит под первую строку */
+    flex:0 0 100%;           /* занимает всю ширину */
+    margin-left:0;           /* убираем старый отступ */
+    font-size:24px;          /* чуть поменьше, чтобы влезало */
+  }
+  .badge{
+    order:4;
+    flex:0 0 100%;
+  }
+
+  header{gap:16px 24px;}     /* чуть плотнее вертикально */
+}
+
+/* супер-узкие экраны (<420 px): ещё меньше паддинги и шрифт */
+@media (max-width:420px){
+  header{padding:16px 20px;}
+  .greeting{font-size:20px;}
+}
+
 /* левый бэйдж */
 .badge{
   background:var(--dark);color:#fff;border-radius:14px;
@@ -321,13 +368,28 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
   padding:80px 40px 40px;
   font-size:16px;
 }
+/* 1. Автоматическое «складывание» — самый короткий способ */
 .foot-grid{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:80px;                     /* больше воздуха, как на скрине */
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:80px;
   max-width:1400px;
   margin:0 auto;
 }
+
+/* 2. Доп-тонкая настройка: как именно вести себя на конкретных брейк-пойнтах */
+@media (max-width:1200px){        /* планшеты в книжной ориентации */
+  .foot-grid{grid-template-columns:repeat(3,1fr);gap:48px;}
+}
+@media (max-width:900px){         /* маленькие планшеты / большие мобилы */
+  .foot-grid{grid-template-columns:repeat(2,1fr);gap:32px;}
+}
+@media (max-width:600px){         /* смартфоны */
+  .foot-grid{grid-template-columns:1fr;gap:24px;}
+  .foot-col{text-align:center;}   /* чтобы смотрелось симметрично */
+  .social{justify-content:center;}
+}
+
 
 /* --- заголовки колонок --- */
 .foot-col strong{
@@ -428,8 +490,8 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
   min-height:100vh;
 }
 
-/* ==== ≤1340 – прячем правый ==== */
-@media (max-width:1340px){
+/* ==== ≤1500 – прячем правый ==== */
+@media (max-width:1500px){
   .wrapper{
     grid-template-columns:280px 1fr;
     grid-template-areas:"left main";
@@ -438,7 +500,7 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
 }
 
 /* ==== ≤1000 – прячем и левый ==== */
-@media (max-width:1000px){
+@media (max-width:1050px){
   .wrapper{
     grid-template-columns:1fr;
     grid-template-areas:"main";
@@ -449,13 +511,76 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
   }
 }
 
-/* ==== ≤768 – мобилка-косметика ==== */
-@media (max-width:768px){
+/* ==== ≤930 – мобилка-косметика ==== */
+@media (max-width:950px){
   header{flex-wrap:wrap;gap:20px;}
   .products{grid-template-columns:1fr;}
+  main {
+    width:935px
+  }
 }
+@media (max-width:900px){
+main {
+  width:885px
+}
+}
+@media (max-width:850px){
+main {
+  width:835px
+}
+}
+@media (max-width:800px){
+main {
+  width:785px
+}
+}
+@media (max-width:750px){
+main {
+  width:735px
+}
+}
+@media (max-width:700px){
 
+  main {
+    width:685px
+  }
+}
+@media (max-width:650px){
 
+main {
+  width:635px
+}
+}
+@media (max-width:600px){
+
+main {
+  width:585px
+}
+}
+@media (max-width:550px){
+
+main {
+  width:535px
+}
+}
+@media (max-width:500px){
+
+main {
+  width:485px
+}
+}
+@media (max-width:450px){
+
+main {
+  width:435px
+}
+}
+@media (max-width:400px){
+
+main {
+  width:385px
+}
+}
 </style>
 </head>
 <body>
