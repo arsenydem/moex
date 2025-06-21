@@ -20,6 +20,15 @@
     border-radius: 50%
 }
 
+.banner-fkfksks {
+    width: 85px
+}
+/* заставим курсор намекать, что это кликабельно */
+.shapka-card{margin-bottom:25px;display:flex;justify-content:space-between;
+             align-items:center;cursor:pointer;} 
+.sjfsfnj {
+    width: 100%
+}
 .sber {
     border-radius: 8px
 }
@@ -28,13 +37,7 @@
 body{font-family:"Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.35}
 a{text-decoration:none;color:inherit}
 
-/* -------- GRID -------- */
-.wrapper{
-  display:grid;
-  grid-template-columns:320px 1fr 380px;  /* боковые шире, центр уже */
-  grid-template-rows:auto 1fr auto;
-  min-height:100vh;
-}
+
 
 /* -------- HEADER -------- */
 header{
@@ -54,6 +57,10 @@ header{
   background:var(--dark);color:#fff;border-radius:14px;
   padding:10px 28px;display:flex;align-items:center;gap:14px;
   font-size:18px;font-weight:500
+}
+.badge:hover {
+    background:#434343;
+    cursor: pointer
 }
 .badg{
   border-radius:14px;
@@ -87,30 +94,131 @@ section{margin-block:40px}
 .story p{font-size:13px;margin-top:8px}
 
 /* PRODUCTS */
-h2{font-size:28px;margin-bottom:24px}
-.products{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
-.card{
-  background:var(--card-bg);border:1px solid var(--border);
-  border-radius:14px;padding:26px;min-height:120px;position:relative;
-  display:flex;flex-direction:column;gap:12px
+
+/* ===== Общая сетка ================================================================= */
+.products{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:24px;
 }
-.card.arrow::after{content:"›";position:absolute;right:20px;top:26px;color:var(--muted)}
-.card.full{grid-column:1/-1}
-.amount{font-size:32px;font-weight:600}
-.btn-dark,.btn-grey{margin-top:auto;padding:14px;border:none;border-radius:8px;font-size:16px;cursor:pointer}
+.card{
+  --p:26px;                         /* чтобы не гонять цифры по всему коду */
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:var(--p);
+  min-height:120px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;                         /* чуть больше воздуха между блоками */
+}
+.card.full{grid-column:1/-1;}
+
+h2{font-size:28px;margin-bottom:24px}
+.amount{font-size:28px;font-weight:600}
+
+/* ===== Верхняя линия: текст + SVG =================================================== */
+.card-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;                        /* на случай длинных заголовков */
+}
+
+.panel.arrow svg{transition:transform .25s ease;}
+
+.icon-arrow,
+.icon-bonus{
+  flex-shrink:0;
+  width:24px; height:24px;         /* подгоните под реальный SVG */
+  background:transparent;          /* пока SVG нет */
+}
+
+/* стрелкам класс .arrow больше не нужен для позиционирования,
+   но оставил на случай, если у вас там ещё логика */
+.card.arrow::after{content:none;}
+
+/* ===== Низ карточки ================================================================ */
+.card-foot{
+  margin-top:auto;                 /* прижимает футер к низу */
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* кнопки как были */
+.btn-dark,.btn-grey{
+  width:100%;
+  margin-top:20px;
+  padding:14px;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  cursor:pointer
+}
 .btn-dark{background:var(--dark);color:#fff}
 .btn-grey{background:#dee2e7;color:var(--text)}
-.banner{grid-column:1/-1;background:var(--card-bg);border:1px solid var(--border);border-radius:20px;padding:24px;display:flex;align-items:center;gap:14px}
-.banner-img{margin-left:auto;width:84px;height:84px;border-radius:12px}
+
+/* ===== Баннер оставляем как есть ==================================================== */
+.banner{
+  grid-column:1/-1;
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:24px;
+  display:flex;
+  align-items:center;
+  gap:14px
+}
+.banner-img{
+  margin-left:auto;
+  width:84px;height:84px;
+  border-radius:12px
+}
 
 /* SAVINGS */
 .savings-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .savings-head a{font-size:15px}
 .savings-list{display:flex;flex-direction:column;gap:24px}
-.save-card{display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;cursor:pointer;margin-bottom:40px}
+.save-card{display:flex;justify-content:space-between;align-items:center;gap:16px;background:white;border:1px solid var(--border);border-radius:20px;padding:24px;cursor:pointer;margin-bottom:40px}
 .save-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.06)}
 .save-card h3{font-size:20px}.save-card small{color:var(--muted)}
 .save-img{width:74px;height:74px;border-radius:12px}
+
+/* 1. Базовая подсветка + лёгкая диагональная заливка */
+.new-card{
+  position:relative;
+  border:2px solid #00A1E9;          /* фирменный голубой */
+  background:linear-gradient(135deg,#E9F9FF 0%,#FFFFFF 60%);
+  transition:transform .2s,box-shadow .2s;
+  animation:pulseBorder 2s infinite; /* пульсующая рамка */
+}
+
+/* 2. Наклейка-лента NEW (делается одним псевдо-элементом) */
+.new-card::before{
+  content:"NEW";
+  position:absolute;
+  top:-10px; right:-10px;
+  padding:4px 10px;
+  font:700 12px/1 sans-serif;
+  color:#fff; background:#FF4D4F;    /* контрастный красный */
+  transform:rotate(45deg);
+  box-shadow:0 2px 6px rgba(0,0,0,.2);
+  pointer-events:none;               /* клику по карточке не мешает */
+}
+
+/* 3. Мягкий пульс (border → glow) */
+@keyframes pulseBorder{
+  0%   {box-shadow:0 0 0 0 rgba(0,161,233,.6);}
+  70%  {box-shadow:0 0 0 10px rgba(0,161,233,0);}
+  100% {box-shadow:0 0 0 0 rgba(0,161,233,0);}
+}
+
+/* 4. Небольшой подъём при ховере */
+.new-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
 
 /* -------- RIGHT COLUMN -------- */
 aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36px}
@@ -130,21 +238,42 @@ input[type=number],input[type=text]{width:100%;padding:12px 14px;border:1px soli
 .range-wrap{display:flex;align-items:center;gap:12px}
 .range-wrap input[type=range]{flex:1}
 .range-values{font-size:14px;color:var(--muted)}
-.modal footer{margin-top:32px;text-align:right}
+.modal footer{margin-top:32px;text-align:center}
 .btn{background:var(--dark);color:#fff;border:none;border-radius:10px;padding:14px 32px;font-size:16px;cursor:pointer}
 /* ===== universal panel ===== */
-.panel{background:var(--card-bg);border:1px solid var(--border);border-radius:20px;padding:26px;margin-bottom:36px}
-
+.panel{background:var(--card-bg);border:1px solid #e3e7ec;border-radius:20px;
+       padding:26px}
+.panel:hover{border-color:#555454}
+/* начальное свернутое состояние (по желанию) */
+.panel.collapsed .panel-body{display:none;}
+.panel.collapsed .arrow svg{transform:rotate(270deg);} /* ▼ → ▲ */
+/* небольшая анимация появления (опционально) */
+.panel-body{animation:fadeIn .75s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-5px);}
+                  to  {opacity:1;transform:none;}}
 /* ------------------------------------------------------------------
    ЗАДАНИЯ ОТ ФИНУСЛУГ
 ------------------------------------------------------------------ */
-.task-panel{display:flex;flex-direction:column;gap:22px}
-.tp-header{display:flex;align-items:flex-start;gap:16px}
+.task-panel{
+    background:var(--card-bg);
+    padding:26px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+    border:1px solid #e3e7ec;
+    border-radius:20px;
+    transition:border-color .15s ease, max-height .25s ease;
+}
+.task-panel:hover{border-color:#555454}
+.task-panel:not(.is-open) .tp-body{display:none}
+.task-panel:not(.is-open) .tp-toggle svg{transform:rotate(90deg)} /* ▼ */
+.task-panel.is-open     .tp-toggle svg{transform:rotate(-90deg)} /* ▲ */
+.tp-header{display:flex;align-items:flex-start;gap:16px;cursor:pointer}
 .tp-icon{flex:0 0 48px;height:48px;border-radius:50%;background:var(--yellow);display:grid;place-items:center;font-size:26px}
 .tp-title{flex:1}
 .tp-title strong{font-size:18px}
 .tp-title small{display:block;color:var(--muted);margin-top:2px;font-size:14px;line-height:1.3}
-.tp-toggle{background:none;border:none;font-size:22px;line-height:1;cursor:pointer;padding-top:4px}
+.tp-toggle{background:none;border:none;font-size:22px;line-height:1;cursor:pointer;padding-top:4px;pointer-events:none}
 .tp-progress{display:flex;align-items:center;gap:6px}
 .tp-step{width:18px;height:18px;border-radius:50%;background:#e0e1e3;font-size:14px;font-weight:600;display:grid;place-items:center}
 .tp-step--active{background:var(--green);color:#fff}
@@ -156,6 +285,7 @@ input[type=number],input[type=text]{width:100%;padding:12px 14px;border:1px soli
 .tp-item--disabled{color:#b4b6bc}
 .tp-item--disabled .tp-reward{display:none}
 .tp-item--disabled .tp-down{margin-left:auto;font-size:18px}
+
 
 /* ------------------------------------------------------------------ */
 
@@ -179,22 +309,149 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
 
 
 /* FOOTER */
-footer{grid-column:1/-1;background:#21242b;color:#fff;padding:80px 40px 40px;font-size:16px}
-.foot-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:30px;max-width:1400px;margin:0 auto}
-.foot-col a{display:block;color:#fff;margin-top:6px}
-.badge-ph{width:160px;height:52px;background:#2a2d34;border-radius:10px;margin-top:22px}
-.social{display:flex;gap:16px;margin-top:6px}
-.soc-ico{width:44px;height:44px;background:#fff;border-radius:6px;display:grid;place-items:center;color:#21242b;font-weight:700}
-.footer-note{margin-top:40px;border-top:1px solid #444;padding-top:16px;text-align:center;color:#c7c9d1}
-
-/* ---------- adaptive (коротко) ---------- */
-@media(max-width:1340px){.wrapper{grid-template-columns:280px 1fr}}
-@media(max-width:768px){
-  .wrapper{grid-template-columns:1fr}
-  aside.left,aside.right{display:none}
-  header{flex-wrap:wrap;gap:20px}
-  .products{grid-template-columns:1fr}
+/* ——— базовые цвета и отступы уже были ——— */
+.footer1{
+  grid-column:1/-1;
+  background:#21242b;
+  color:#fff;
+  padding:80px 40px 40px;
+  font-size:16px;
 }
+.foot-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:80px;                     /* больше воздуха, как на скрине */
+  max-width:1400px;
+  margin:0 auto;
+}
+
+/* --- заголовки колонок --- */
+.foot-col strong{
+  display:block;
+  font-size:18px;               /* покрупнее */
+  margin-bottom:10px;
+}
+
+/* --- ссылка «Перейти …» выглядит как кнопку/логотип --- */
+.foot-site{display:inline-flex;align-items:center;gap:12px;
+           font-weight:600;color:#fff;text-decoration:none;}
+.foot-site:hover{text-decoration:underline;}
+.site-ico,
+.soc-ico{
+  flex:0 0 44px;                /* фикс. размер 44×44 */
+  width:44px;height:44px;
+
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;              /* картинка обрежется по радиусу */
+}
+
+/* если внутрь вставишь <img>, он сам впишется */
+.site-ico img,
+.soc-ico img{max-width:75%;max-height:75%;}
+/* ——— правим старое правило ——— */
+.soc-ico{
+  flex:0 0 44px;
+  width:44px;height:44px;
+  background:#fff;
+  border:1px solid #d2d5da;   /* 👈 тонкий серый контур = видно на тёмном фоне */
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+
+/* сама картинка ровно 70 % квадрата */
+.soc-ico img{
+  width:70%;
+  height:70%;
+  object-fit:contain;          /* если это PNG с полями — не растянется */
+  display:block;               /* убираем “inline-gap” */
+}
+
+/* ——— телефоны, почта, адрес ——— */
+.foot-col a{
+  display:block;
+  color:#fff;
+  margin-top:6px;
+  text-decoration:none;
+}
+.foot-col a:hover{text-decoration:underline}
+/* добавь ЭТО после .foot-col a  — или просто ниже в файле */
+.foot-site{
+  display:inline-flex !important;   /* блок → горизонтальный flex */
+  align-items:center;
+  gap:12px;                          /* расстояние между лого и текстом */
+}
+
+/* --- разделительная линия и подпись — оставляем, но подровняем --- */
+.footer-note{
+  margin-top:60px;
+  border-top:1px solid #444;
+  padding-top:16px;
+  text-align:center;
+  color:#c7c9d1;
+}
+/* горизонтальная лента соц-иконок */
+.social{
+  display:flex;            /* не inline-flex, чтобы gap работал одинаково */
+  flex-wrap:nowrap;        /* запрещаем перенос */
+  gap:16px;
+  align-items:center;
+}
+
+/* ссылки-иконки снова строчные, а не “блоковые” */
+.social a{
+  display:inline-flex !important;   /* важнее, чем .foot-col a */
+}
+
+/* если иконка — не <a>, а <span class="soc-ico">, то: */
+.social .soc-ico{
+  display:inline-flex;              /* аналогично */
+}
+
+
+.modal-overlay footer {
+    font-size:16px
+}
+/* ---------- adaptive (коротко) ---------- */
+/* ==== БАЗА (шире 1340) ==== */
+.wrapper{
+  display:grid;
+  grid-template-columns:320px 1fr 380px;   /* left | main | right */
+  grid-template-areas:"left main right";
+  grid-template-rows:auto 1fr auto;
+  gap:24px;
+  min-height:100vh;
+}
+
+/* ==== ≤1340 – прячем правый ==== */
+@media (max-width:1340px){
+  .wrapper{
+    grid-template-columns:280px 1fr;
+    grid-template-areas:"left main";
+  }
+  aside.right{display:none;}
+}
+
+/* ==== ≤1000 – прячем и левый ==== */
+@media (max-width:1000px){
+  .wrapper{
+    grid-template-columns:1fr;
+    grid-template-areas:"main";
+  }
+  aside.left{display:none;}  /* правый уже скрыт выше */
+  .greeting {
+    font-size:24px
+  }
+}
+
+/* ==== ≤768 – мобилка-косметика ==== */
+@media (max-width:768px){
+  header{flex-wrap:wrap;gap:20px;}
+  .products{grid-template-columns:1fr;}
+}
+
+
 </style>
 </head>
 <body>
@@ -211,7 +468,17 @@ footer{grid-column:1/-1;background:#21242b;color:#fff;padding:80px 40px 40px;fon
 
     <!-- icons -->
     <div class="user-box">
-      <span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M17.294 7.291A5.274 5.274 0 0 1 12 12.583a5.275 5.275 0 0 1-5.294-5.292A5.274 5.274 0 0 1 12 2a5.273 5.273 0 0 1 5.294 5.291ZM12 22c-4.338 0-8-.705-8-3.425 0-2.721 3.685-3.401 8-3.401 4.339 0 8 .705 8 3.425C20 21.32 16.315 22 12 22Z" fill="currentColor"></path></svg></span><div class="divider"></div><span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.138 2.12269C10.5859 1.99238 11.059 1.96542 11.5196 2.04397C11.9802 2.12252 12.4154 2.30439 12.7906 2.57507C13.1658 2.84576 13.4706 3.19775 13.6805 3.60297C13.8905 4.00818 13.9999 4.45539 14 4.90889V19.0911C13.9999 19.5446 13.8905 19.9918 13.6805 20.397C13.4706 20.8022 13.1658 21.1542 12.7906 21.4249C12.4154 21.6956 11.9802 21.8775 11.5196 21.956C11.059 22.0346 10.5859 22.0076 10.138 21.8773L4.138 20.1317C3.5201 19.9519 2.97841 19.5838 2.59328 19.0819C2.20815 18.58 2.00011 17.9711 2 17.3455V6.65452C2.00011 6.0289 2.20815 5.41998 2.59328 4.91809C2.97841 4.4162 3.5201 4.04807 4.138 3.86831L10.138 2.12269ZM15 4.24168C15 3.98447 15.1054 3.7378 15.2929 3.55593C15.4804 3.37406 15.7348 3.27189 16 3.27189H19C19.7956 3.27189 20.5587 3.57841 21.1213 4.12402C21.6839 4.66964 22 5.40965 22 6.18126V7.15105C22 7.40825 21.8946 7.65492 21.7071 7.83679C21.5196 8.01866 21.2652 8.12084 21 8.12084C20.7348 8.12084 20.4804 8.01866 20.2929 7.83679C20.1054 7.65492 20 7.40825 20 7.15105V6.18126C20 5.92405 19.8946 5.67738 19.7071 5.49551C19.5196 5.31364 19.2652 5.21147 19 5.21147H16C15.7348 5.21147 15.4804 5.10929 15.2929 4.92742C15.1054 4.74555 15 4.49888 15 4.24168ZM21 15.8792C21.2652 15.8792 21.5196 15.9813 21.7071 16.1632C21.8946 16.3451 22 16.5917 22 16.849V17.8187C22 18.5904 21.6839 19.3304 21.1213 19.876C20.5587 20.4216 19.7956 20.7281 19 20.7281H16C15.7348 20.7281 15.4804 20.6259 15.2929 20.4441C15.1054 20.2622 15 20.0155 15 19.7583C15 19.5011 15.1054 19.2544 15.2929 19.0726C15.4804 18.8907 15.7348 18.7885 16 18.7885H19C19.2652 18.7885 19.5196 18.6864 19.7071 18.5045C19.8946 18.3226 20 18.0759 20 17.8187V16.849C20 16.5917 20.1054 16.3451 20.2929 16.1632C20.4804 15.9813 20.7348 15.8792 21 15.8792ZM9 11.0302C8.73478 11.0302 8.48043 11.1324 8.29289 11.3143C8.10536 11.4961 8 11.7428 8 12C8 12.2572 8.10536 12.5039 8.29289 12.6857C8.48043 12.8676 8.73478 12.9698 9 12.9698H9.001C9.26622 12.9698 9.52057 12.8676 9.70811 12.6857C9.89564 12.5039 10.001 12.2572 10.001 12C10.001 11.7428 9.89564 11.4961 9.70811 11.3143C9.52057 11.1324 9.26622 11.0302 9.001 11.0302H9Z" fill="currentColor"></path><path d="M16 12H21M21 12L19 10M21 12L19 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+    <span class="shapka-icons">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M17.294 7.291A5.274 5.274 0 0 1 12 12.583a5.275 5.275 0 0 1-5.294-5.292A5.274 5.274 0 0 1 12 2a5.273 5.273 0 0 1 5.294 5.291ZM12 22c-4.338 0-8-.705-8-3.425 0-2.721 3.685-3.401 8-3.401 4.339 0 8 .705 8 3.425C20 21.32 16.315 22 12 22Z" fill="currentColor"></path>
+        </svg>
+    </span>
+      <div class="divider"></div>
+      <span class="shapka-icons">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M10.138 2.12269C10.5859 1.99238 11.059 1.96542 11.5196 2.04397C11.9802 2.12252 12.4154 2.30439 12.7906 2.57507C13.1658 2.84576 13.4706 3.19775 13.6805 3.60297C13.8905 4.00818 13.9999 4.45539 14 4.90889V19.0911C13.9999 19.5446 13.8905 19.9918 13.6805 20.397C13.4706 20.8022 13.1658 21.1542 12.7906 21.4249C12.4154 21.6956 11.9802 21.8775 11.5196 21.956C11.059 22.0346 10.5859 22.0076 10.138 21.8773L4.138 20.1317C3.5201 19.9519 2.97841 19.5838 2.59328 19.0819C2.20815 18.58 2.00011 17.9711 2 17.3455V6.65452C2.00011 6.0289 2.20815 5.41998 2.59328 4.91809C2.97841 4.4162 3.5201 4.04807 4.138 3.86831L10.138 2.12269ZM15 4.24168C15 3.98447 15.1054 3.7378 15.2929 3.55593C15.4804 3.37406 15.7348 3.27189 16 3.27189H19C19.7956 3.27189 20.5587 3.57841 21.1213 4.12402C21.6839 4.66964 22 5.40965 22 6.18126V7.15105C22 7.40825 21.8946 7.65492 21.7071 7.83679C21.5196 8.01866 21.2652 8.12084 21 8.12084C20.7348 8.12084 20.4804 8.01866 20.2929 7.83679C20.1054 7.65492 20 7.40825 20 7.15105V6.18126C20 5.92405 19.8946 5.67738 19.7071 5.49551C19.5196 5.31364 19.2652 5.21147 19 5.21147H16C15.7348 5.21147 15.4804 5.10929 15.2929 4.92742C15.1054 4.74555 15 4.49888 15 4.24168ZM21 15.8792C21.2652 15.8792 21.5196 15.9813 21.7071 16.1632C21.8946 16.3451 22 16.5917 22 16.849V17.8187C22 18.5904 21.6839 19.3304 21.1213 19.876C20.5587 20.4216 19.7956 20.7281 19 20.7281H16C15.7348 20.7281 15.4804 20.6259 15.2929 20.4441C15.1054 20.2622 15 20.0155 15 19.7583C15 19.5011 15.1054 19.2544 15.2929 19.0726C15.4804 18.8907 15.7348 18.7885 16 18.7885H19C19.2652 18.7885 19.5196 18.6864 19.7071 18.5045C19.8946 18.3226 20 18.0759 20 17.8187V16.849C20 16.5917 20.1054 16.3451 20.2929 16.1632C20.4804 15.9813 20.7348 15.8792 21 15.8792ZM9 11.0302C8.73478 11.0302 8.48043 11.1324 8.29289 11.3143C8.10536 11.4961 8 11.7428 8 12C8 12.2572 8.10536 12.5039 8.29289 12.6857C8.48043 12.8676 8.73478 12.9698 9 12.9698H9.001C9.26622 12.9698 9.52057 12.8676 9.70811 12.6857C9.89564 12.5039 10.001 12.2572 10.001 12C10.001 11.7428 9.89564 11.4961 9.70811 11.3143C9.52057 11.1324 9.26622 11.0302 9.001 11.0302H9Z" fill="currentColor"></path><path d="M16 12H21M21 12L19 10M21 12L19 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+    </span>
     </div>
   </header>
 
@@ -244,22 +511,93 @@ footer{grid-column:1/-1;background:#21242b;color:#fff;padding:80px 40px 40px;fon
       <!-- PRODUCTS -->
       <section>
         <h2>Мои продукты</h2>
+      
         <div class="products">
-          <div class="card arrow"><div>Потратить бонусы<br><small>Финков</small></div><div class="amount">200 🪙</div></div>
-          <div class="card arrow"><div>Подключите Госуслуги<br><small>И получите бонус</small></div></div>
-          <div class="card full arrow"><div>Все активы</div><div class="amount">0 ₽</div></div>
-          <div class="card"><div>Баланс Кошелька<br><span class="amount">0 ₽</span></div><button class="btn-dark">Пополнить</button></div>
-          <div class="card"><div>Бонусный счёт<br><small>Получите 19 % на остаток</small></div><button class="btn-grey">Активировать</button></div>
-          <div class="banner"><div><strong>Бонус до 1000 ₽ на ОСАГО!</strong><br><small>При покупке полиса с промокодом</small></div><div class="banner-img"><img alt="Бонус до 1000 ₽ на ОСАГО!" src="https://assets.finuslugi.ru/mp-emailmarketing/icon1_gift_200x200.png" loading="lazy" width="80" class="RiSWQlXCbvdVvXEDeIJ-dg==" data-qa="cvm-banner-image"></div></div>
+          <!-- Потратить бонусы -->
+          <div class="card arrow">
+            <div class="card-head">
+              <div>Потратить бонусы<br><small>Финков</small></div>
+              <!-- ваша SVG-стрелка -->
+              <span class="icon-arrow" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z" fill="currentColor"></path></svg></span>
+            </div>
+      
+            <div class="card-foot">
+              <div class="amount">200&nbsp;🪙</div>
+            </div>
+          </div>
+      
+          <!-- Подключите Госуслуги -->
+          <div class="card arrow">
+            <div class="card-head">
+              <div>Подключите Госуслуги<br><small>И получите бонус</small></div>
+              <span class="icon-arrow" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z" fill="currentColor"></path></svg></span>
+            </div>
+      
+            <div class="card-foot">
+              <div class="amount"></div>  <!-- placeholder, чтобы «слева было что-то» -->
+            </div>
+          </div>
+      
+          <!-- Все активы -->
+          <div class="card full arrow">
+            <div class="card-head">
+              <div>Все активы</div>
+              <span class="icon-arrow" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z" fill="currentColor"></path></svg></span>
+            </div>
+      
+            <div class="card-foot">
+              <div class="amount">0&nbsp;₽</div>
+            </div>
+          </div>
+      
+          <!-- Баланс Кошелька -->
+          <div class="card">
+            <div class="card-head">
+              <div>Баланс Кошелька</div>
+              <span class="icon-arrow" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z" fill="currentColor"></path></svg></span>
+
+            </div>
+      
+            <div class="card-foot">
+                <div class="sjfsfnj">
+              <div class="amount">0&nbsp;₽</div>
+              <button class="btn-dark">Пополнить</button>
+            </div>
+            </div>
+          </div>
+      
+          <!-- Бонусный счёт -->
+          <div class="card bonus">
+            <div class="card-head">
+              <div>Бонусный счёт<br><small>Получите&nbsp;19&nbsp;% на остаток</small></div>
+              <!-- здесь не стрелка, а ваша «спец-SVG» -->
+              <span class="icon-bonus" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm0-18a8 8 0 1 1 0 16 8 8 0 0 1 0-16Z"></path><path fill="currentColor" d="M11.62 17.915a1 1 0 0 0 .76 0 1 1 0 0 0 .33-.21c.088-.097.16-.209.21-.33a.84.84 0 0 0 .08-.38 1 1 0 0 0-.29-.71 1.152 1.152 0 0 0-.33-.21 1 1 0 0 0-1.38.92c.004.265.107.518.29.71a.999.999 0 0 0 .33.21Z"></path><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M8 9.584C8 7.47 9.935 6 12 6s4 1.47 4 3.584c0 1.632-1.222 2.45-1.981 2.89h-.002c-.74.43-1.017.745-1.017 1.203V14a1 1 0 1 1-2 0v-.323c0-1.653 1.237-2.482 2.015-2.933.722-.42.985-.723.985-1.16C14 8.844 13.25 8 12 8s-2 .844-2 1.584a1 1 0 0 1-2 0Z"></path></svg></span>
+            </div>
+      
+            <div class="card-foot">
+              <!-- слева можно поставить «—» или процент; оставил пусто -->
+              <button class="btn-grey">Активировать</button>
+            </div>
+          </div>
+      
+          <!-- Баннер не трогаем -->
+          <div class="banner">
+            <div><strong>Бонус до 1000&nbsp;₽ на ОСАГО!</strong><br><small>При покупке полиса с промокодом</small></div>
+            <div class="banner-img">
+              <img class="banner-fkfksks" src="https://assets.finuslugi.ru/mp-emailmarketing/icon1_gift_200x200.png"
+                   alt="Бонус до 1000 ₽ на ОСАГО!">
+            </div>
+          </div>
         </div>
       </section>
+      
   
       <!-- SAVINGS -->
       <section>
         <div class="savings-head"><h2 style="margin:0">Сбережения</h2><a href="#">Посмотреть ›</a></div>
         <div class="savings-list">
           <div class="save-card"><div class="save-info"><h3>Ваша повышенная ставка</h3><small>Подборка вкладов с эксклюзивными условиями</small></div><div class="save-img"><img alt="Ваша повышенная ставка" src="https://assets.finuslugi.ru/mp-emailmarketing/PIC_DEP_PROMO_LKMP.png" loading="lazy" width="80" class="sber" data-qa="cvm-banner-image"></div></div>
-          <div class="save-card" id="smartCard"><div class="save-info"><h3>SmartВклад</h3><small>Пополняйте и снимайте без потери процента</small></div><div class="save-img"><img alt="SmartВклад" src="https://i.ibb.co/6c2phG1D/0fe15c9c-3fe9-45ff-9e37-77596c5535c8.png" loading="lazy" width="60"></div></div>
+          <div class="save-card new-card" id="smartCard"><div class="save-info"><h3>SmartВклад</h3><small>Лучший вариант для студентов</small></div><div class="save-img"><img alt="SmartВклад" src=https://i.ibb.co/6c2phG1D/0fe15c9c-3fe9-45ff-9e37-77596c5535c8.png" loading="lazy" width="60"></div></div>
           <div class="save-card"><div class="save-info"><h3>Вклады</h3><small>С высоким доходом</small><br><button class="btn-grey" style="margin-top:10px">Выбрать вклад</button></div><div class="save-img"><svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg" class=""><path d="M31.5614 8.23835L10.6102 16.4371C3.01067 19.4111 0.168076 25.199 2.87905 32.1495L12.0608 55.6902C14.8162 62.7546 20.7875 64.9883 28.387 62.0144L49.3383 53.8156C57.0603 50.7938 59.8134 45.1459 57.058 38.0815L47.8763 14.5408C45.1653 7.59027 39.2834 5.2165 31.5614 8.23835Z" fill="url(#paint0_linear_1898_56301)"></path><path d="M79.6688 41.0884C79.6688 36.1211 78.1535 32.1446 75.3278 29.4106C72.5032 26.6776 68.4 25.2158 63.2815 25.2158H36.7025C31.5827 25.2158 27.4788 26.6776 24.6539 29.4106C21.8279 32.1446 20.3125 36.1211 20.3125 41.0884V62.5018C20.3125 67.4691 21.8279 71.4512 24.6537 74.1909C27.4785 76.9296 31.5824 78.3972 36.7025 78.3972H63.2919C68.4107 78.3972 72.5139 76.9296 75.3384 74.1909C78.1639 71.4512 79.6793 67.4691 79.6793 62.5018C79.6793 57.5859 79.6767 52.5041 79.6741 48.5154C79.6728 46.5133 79.6714 44.7867 79.6705 43.4948C79.6695 42.2128 79.6688 41.3588 79.6688 41.0884Z" fill="#00A1E9" fill-opacity="0.21" stroke="url(#paint1_linear_1898_56301)" stroke-width="0.5"></path><path d="M53.9934 55.1838L53.9934 55.1838L53.9947 55.1899C54.8143 58.8824 58.0835 61.4844 61.8206 61.4178H78.0413C79.6872 61.4178 81.0169 60.0684 81.0169 58.4072L81.0169 48.881L81.0169 48.8805C81.0134 47.2236 79.6878 45.8708 78.0418 45.8672H78.0413L61.5277 45.8672L61.5269 45.8672C57.2716 45.8807 53.8401 49.3785 53.8467 53.682C53.8467 54.1863 53.8968 54.6903 53.9934 55.1838Z" fill="#4DC0F3" fill-opacity="0.21" stroke="url(#paint2_linear_1898_56301)" stroke-width="0.5"></path><path d="M53.9934 55.1838L53.9934 55.1838L53.9947 55.1899C54.8143 58.8824 58.0835 61.4844 61.8206 61.4178H78.0413C79.6872 61.4178 81.0169 60.0684 81.0169 58.4072V48.881V48.8805C81.0134 47.2236 79.6878 45.8708 78.0418 45.8672H78.0413L61.5277 45.8672L61.5269 45.8672C57.2716 45.8807 53.8401 49.3785 53.8467 53.682C53.8467 54.1863 53.8968 54.6903 53.9934 55.1838Z" fill="url(#paint3_radial_1898_56301)" fill-opacity="0.21" stroke="url(#paint4_linear_1898_56301)" stroke-width="0.5"></path><path d="M58.641 53.5732C58.641 55.2358 59.9888 56.5836 61.6514 56.5836C63.3139 56.5836 64.6617 55.2358 64.6617 53.5732C64.6617 51.9107 63.3139 50.5629 61.6514 50.5629C59.9888 50.5629 58.641 51.9107 58.641 53.5732Z" fill="url(#paint5_linear_1898_56301)" fill-opacity="0.71" stroke="url(#paint6_linear_1898_56301)" stroke-width="0.2"></path><g filter="url(#filter0_bd_1898_56301)"><path fill-rule="evenodd" clip-rule="evenodd" d="M30.7686 35.5754C30.7686 34.1611 31.9444 33.0146 33.3948 33.0146H51.7998C53.2502 33.0146 54.426 34.1611 54.426 35.5754C54.426 36.9897 53.2502 38.1361 51.7998 38.1361H33.3948C31.9444 38.1361 30.7686 36.9897 30.7686 35.5754Z" fill="url(#paint7_linear_1898_56301)" fill-opacity="0.95" shape-rendering="crispEdges"></path><path d="M30.8686 35.5754C30.8686 34.2187 31.9972 33.1146 33.3948 33.1146H51.7998C53.1974 33.1146 54.326 34.2187 54.326 35.5754C54.326 36.9321 53.1974 38.0361 51.7998 38.0361H33.3948C31.9972 38.0361 30.8686 36.9321 30.8686 35.5754Z" stroke="url(#paint8_linear_1898_56301)" stroke-width="0.2" shape-rendering="crispEdges"></path></g><defs><filter id="filter0_bd_1898_56301" x="24.7686" y="27.0146" width="43.6572" height="25.1216" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feGaussianBlur in="BackgroundImage" stdDeviation="2.5"></feGaussianBlur><feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_1898_56301"></feComposite><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix><feOffset dx="4" dy="4"></feOffset><feGaussianBlur stdDeviation="5"></feGaussianBlur><feComposite in2="hardAlpha" operator="out"></feComposite><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0.631373 0 0 0 0 0.913725 0 0 0 0.85 0"></feColorMatrix><feBlend mode="normal" in2="effect1_backgroundBlur_1898_56301" result="effect2_dropShadow_1898_56301"></feBlend><feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_1898_56301" result="shape"></feBlend></filter><linearGradient id="paint0_linear_1898_56301" x1="22.4178" y1="65.9391" x2="24.2137" y2="-19.6639" gradientUnits="userSpaceOnUse"><stop offset="0.209044" stop-color="#00A1E9"></stop><stop offset="0.443749" stop-color="#71C6EC"></stop></linearGradient><linearGradient id="paint1_linear_1898_56301" x1="92.0468" y1="77.2072" x2="27.6006" y2="6.84109" gradientUnits="userSpaceOnUse"><stop offset="0.101008" stop-color="#00A1E9"></stop><stop offset="0.614167" stop-color="white" stop-opacity="0.63"></stop></linearGradient><linearGradient id="paint2_linear_1898_56301" x1="39.9461" y1="39.8398" x2="58.7395" y2="67.4455" gradientUnits="userSpaceOnUse"><stop offset="0.101008" stop-color="#6CBEE3"></stop><stop offset="0.614167" stop-color="white" stop-opacity="0.63"></stop></linearGradient><radialGradient id="paint3_radial_1898_56301" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(89.8181 39.9296) rotate(149.571) scale(50.3053 88.9439)"><stop offset="0.503672" stop-color="#00A1E9"></stop><stop offset="0.865222" stop-color="white" stop-opacity="0"></stop></radialGradient><linearGradient id="paint4_linear_1898_56301" x1="39.9461" y1="39.8398" x2="58.7395" y2="67.4455" gradientUnits="userSpaceOnUse"><stop offset="0.101008" stop-color="#00A1E9"></stop><stop offset="0.614167" stop-color="white" stop-opacity="0.63"></stop></linearGradient><linearGradient id="paint5_linear_1898_56301" x1="57.6569" y1="49.5787" x2="68.7093" y2="56.6522" gradientUnits="userSpaceOnUse"><stop offset="0.0953462" stop-color="#00A1E9"></stop><stop offset="0.564415" stop-color="white" stop-opacity="0.63"></stop></linearGradient><linearGradient id="paint6_linear_1898_56301" x1="65.6948" y1="52.0181" x2="55.1067" y2="52.8618" gradientUnits="userSpaceOnUse"><stop stop-color="#A6E3FF" stop-opacity="0"></stop><stop offset="0.552083" stop-color="white" stop-opacity="0.85"></stop></linearGradient><linearGradient id="paint7_linear_1898_56301" x1="57.7884" y1="32.2867" x2="51.7052" y2="50.2705" gradientUnits="userSpaceOnUse"><stop offset="0.0953462" stop-color="#00A1E9"></stop><stop offset="0.564415" stop-color="white" stop-opacity="0.63"></stop></linearGradient><linearGradient id="paint8_linear_1898_56301" x1="27.2199" y1="34.295" x2="62.9071" y2="47.4314" gradientUnits="userSpaceOnUse"><stop stop-color="#A6E3FF" stop-opacity="0"></stop><stop offset="0.552083" stop-color="white" stop-opacity="0.85"></stop></linearGradient></defs></svg></div></div>
         </div>
       </section>
@@ -269,50 +607,79 @@ footer{grid-column:1/-1;background:#21242b;color:#fff;padding:80px 40px 40px;fon
      <!-- RIGHT COLUMN -->
   <aside class="right">
 
-    <!-- ===== ЗАДАНИЯ panel ===== -->
-    <div class="panel task-panel">
-
-      <div class="tp-header">
+    <!-- .is-open — ставим, если хотим открыть карточку по умолчанию -->
+    <div class="task-panel is-open" id="tasks">
+        <div class="tp-header">
         <div class="tp-icon"><img src="https://assets.finuslugi.ru/mp-assets/images/checklist/simple-level.png" alt="Начальный уровень" class="m-layout-header-level-icon"></div>
+    
         <div class="tp-title">
-          <strong>Задания от Финуслуг</strong>
-          <small>Выполняйте задания и покупайте облигации</small>
+            <strong>Задания от Финуслуг</strong>
+            <small>Выполняйте задания и покупайте облигации</small>
         </div>
-        <button class="tp-toggle"></button>
-      </div>
-
-      <div class="tp-progress">
+    
+        <!-- Стрелку оставляем ради семантики, но кликаем по всей шапке -->
+        <button class="tp-toggle" aria-label="Свернуть / развернуть">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="hfnsknk" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z"></path></svg>
+        </button>
+        </div>
+    
+        <div class="tp-progress">
         <span class="tp-step tp-step--active">1</span>
-        <div class="tp-bar"><div class="tp-bar-fill"></div></div>
+        <div class="tp-bar"><div class="tp-bar-fill" style="width:60%"></div></div>
         <span class="tp-step">2</span>
-      </div>
-
-      <div class="tp-item"><span>Привязать Госуслуги</span><span class="tp-reward">+500</span></div>
-      <div class="tp-item"><span>Подтвердить email</span><span class="tp-reward">+100</span></div>
-
-      <div class="tp-item tp-item--disabled">
-        Скачать мобильное приложение и войти в Финуслуги
-        <span class="tp-down"><span class="new-ui-icon TNSJf2mvUrXelLtclJ+XDA==" data-qa="checklist-item-done-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.04249 12.5556C4.04249 7.85257 7.83281 4.04737 12.4994 4.04737C17.166 4.04737 20.9563 7.85257 20.9563 12.5556C20.9563 17.2586 17.166 21.0638 12.4994 21.0638C7.83281 21.0638 4.04249 17.2586 4.04249 12.5556ZM12.4994 2.5C6.97015 2.5 2.49512 7.00607 2.49512 12.5556C2.49512 18.105 6.97015 22.6111 12.4994 22.6111C18.0286 22.6111 22.5037 18.105 22.5037 12.5556C22.5037 7.00607 18.0286 2.5 12.4994 2.5ZM16.7881 10.7283C17.0607 10.3993 17.015 9.91157 16.686 9.63891C16.357 9.36626 15.8693 9.41194 15.5966 9.74094L11.5249 14.6541L9.35645 12.4736C9.05515 12.1706 8.56528 12.1693 8.2623 12.4706C7.95933 12.7719 7.95797 13.2618 8.25927 13.5647L11.0285 16.3493C11.1823 16.504 11.3942 16.5865 11.6121 16.5766C11.83 16.5668 12.0336 16.4654 12.1728 16.2974L16.7881 10.7283Z" fill="currentColor"></path></svg></span></span>
-      </div>
-
+        </div>
+    
+        <!-- Тело, которое будем прятать -->
+        <div class="tp-body">
+        <div class="tp-item"><span>Привязать Госуслуги</span><span class="tp-reward">+500</span></div>
+        <div class="tp-item"><span>Подтвердить email</span><span class="tp-reward">+100</span></div>
+        <div class="tp-item tp-item--disabled">
+            Скачать мобильное приложение и войти в Финуслуги
+            <span class="tp-down"><span class="new-ui-icon TNSJf2mvUrXelLtclJ+XDA==" data-qa="checklist-item-done-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.04249 12.5556C4.04249 7.85257 7.83281 4.04737 12.4994 4.04737C17.166 4.04737 20.9563 7.85257 20.9563 12.5556C20.9563 17.2586 17.166 21.0638 12.4994 21.0638C7.83281 21.0638 4.04249 17.2586 4.04249 12.5556ZM12.4994 2.5C6.97015 2.5 2.49512 7.00607 2.49512 12.5556C2.49512 18.105 6.97015 22.6111 12.4994 22.6111C18.0286 22.6111 22.5037 18.105 22.5037 12.5556C22.5037 7.00607 18.0286 2.5 12.4994 2.5ZM16.7881 10.7283C17.0607 10.3993 17.015 9.91157 16.686 9.63891C16.357 9.36626 15.8693 9.41194 15.5966 9.74094L11.5249 14.6541L9.35645 12.4736C9.05515 12.1706 8.56528 12.1693 8.2623 12.4706C7.95933 12.7719 7.95797 13.2618 8.25927 13.5647L11.0285 16.3493C11.1823 16.504 11.3942 16.5865 11.6121 16.5766C11.83 16.5668 12.0336 16.4654 12.1728 16.2974L16.7881 10.7283Z" fill="currentColor"></path></svg></span></span>
+        </div>
+        </div>
     </div>
-  
       <!-- CREDIT RATING -->
-      <div class="panel">
-        <h3>Кредитный рейтинг <span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="hfnsknk" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z"></path></svg></span></h3>
-        <svg width="222" height="111" viewBox="0 0 222 111" fill="none" xmlns="http://www.w3.org/2000/svg" class="Yj0qQ8byq17iKdBsXIPFFA==" data-qa="credit-rating-ranges-img"><path fill-rule="evenodd" clip-rule="evenodd" d="M208 111C208 57.4284 164.572 14 111 14C57.4284 14 14 57.4284 14 111H22C22 61.8467 61.8467 22 111 22C160.153 22 200 61.8467 200 111H208Z" fill="#DBDBDB"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M198 111C198 62.9512 159.049 24 111 24C62.9512 24 24 62.9512 24 111H26C26 64.0558 64.0558 26 111 26C157.944 26 196 64.0558 196 111H198Z" fill="#C4C4C4"></path><path data-regular="bad" d="M14 111L21.9847 111C21.9886 88.228 30.6777 65.4571 48.0522 48.0826L42.3954 42.4258C24.8508 59.9782 14 84.2219 14 111Z" fill="#FF0508"></path><path data-regular="fair" d="M42.4106 42.4106L48.0567 48.0567C64.1617 31.9571 86.4073 21.9999 110.979 21.9999V14C86.1612 14.0055 61.3456 23.4757 42.4106 42.4106Z" fill="#FF9045"></path><path data-regular="good" d="M111 14L111 21.9847C133.772 21.9886 156.543 30.6777 173.917 48.0522L179.574 42.3954C162.022 24.8508 137.778 14 111 14Z" fill="#FFE16C"></path><path data-regular="excellent" d="M179.589 42.4106L173.943 48.0567C190.043 64.1617 200 86.4073 200 110.978H208C207.995 86.1612 198.524 61.3456 179.589 42.4106Z" fill="#6EC959"></path><path data-expanded="bad" d="M21.9847 111H3.99991C3.99991 81.4605 15.97 54.7167 35.3243 35.3547L48.0522 48.0826C30.6777 65.4571 21.9886 88.228 21.9847 111Z" fill="#FF0508"></path><path data-expanded-arrow="bad" d="M21.3837 73.8797L32.4101 74.6975L29.7588 81.0983L21.3837 73.8797Z" fill="#BEBABA"></path><path data-expanded="fair" d="M48.0567 48.0567L35.3395 35.3395C56.2271 14.4519 83.602 4.00534 110.978 3.99989V21.9999C86.4073 21.9999 64.1617 31.9571 48.0567 48.0567Z" fill="#FF9045"></path><path data-expanded-arrow="fair" d="M73.8797 21.3837L81.0983 29.7588L74.6975 32.4101L73.8797 21.3837Z" fill="#BEBABA"></path><path data-expanded="good" d="M111 21.9847V3.99986C140.54 3.99986 167.283 15.97 186.645 35.3243L173.917 48.0522C156.543 30.6777 133.772 21.9885 111 21.9847Z" fill="#FFE16C"></path><path data-expanded-arrow="good" d="M148.12 21.3837L147.303 32.4101L140.902 29.7588L148.12 21.3837Z" fill="#BEBABA"></path><path data-expanded="excellent" d="M173.943 48.0567L186.661 35.3395C207.548 56.2271 217.995 83.6019 218 110.978H200C200 86.4072 190.043 64.1617 173.943 48.0567Z" fill="#6EC959"></path><path data-expanded-arrow="excellent" d="M200.616 73.8797L192.241 81.0983L189.59 74.6975L200.616 73.8797Z" fill="#BEBABA"></path>
-          <text x="100" y="75" font-size="30" fill="var(--text)"               text-anchor="middle">0</text>
-          <text x="100" y="95" font-size="14" fill="var(--text)"               text-anchor="middle">Можно узнать</text>
-        </svg>
+      <div class="panel" id="creditPanel">
+        <h3 class="shapka-card">
+          Кредитный рейтинг
+          <span class="arrow">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="hfnsknk" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z"></path>
+            </svg>
+          </span>
+        </h3>
+      
+        <!-- то, что должно прятаться -->
+        <div class="panel-body">
+            <svg width="222" height="111" viewBox="0 0 222 111" fill="none" xmlns="http://www.w3.org/2000/svg" class="Yj0qQ8byq17iKdBsXIPFFA==" data-qa="credit-rating-ranges-img"><path fill-rule="evenodd" clip-rule="evenodd" d="M208 111C208 57.4284 164.572 14 111 14C57.4284 14 14 57.4284 14 111H22C22 61.8467 61.8467 22 111 22C160.153 22 200 61.8467 200 111H208Z" fill="#DBDBDB"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M198 111C198 62.9512 159.049 24 111 24C62.9512 24 24 62.9512 24 111H26C26 64.0558 64.0558 26 111 26C157.944 26 196 64.0558 196 111H198Z" fill="#C4C4C4"></path><path data-regular="bad" d="M14 111L21.9847 111C21.9886 88.228 30.6777 65.4571 48.0522 48.0826L42.3954 42.4258C24.8508 59.9782 14 84.2219 14 111Z" fill="#FF0508"></path><path data-regular="fair" d="M42.4106 42.4106L48.0567 48.0567C64.1617 31.9571 86.4073 21.9999 110.979 21.9999V14C86.1612 14.0055 61.3456 23.4757 42.4106 42.4106Z" fill="#FF9045"></path><path data-regular="good" d="M111 14L111 21.9847C133.772 21.9886 156.543 30.6777 173.917 48.0522L179.574 42.3954C162.022 24.8508 137.778 14 111 14Z" fill="#FFE16C"></path><path data-regular="excellent" d="M179.589 42.4106L173.943 48.0567C190.043 64.1617 200 86.4073 200 110.978H208C207.995 86.1612 198.524 61.3456 179.589 42.4106Z" fill="#6EC959"></path><path data-expanded="bad" d="M21.9847 111H3.99991C3.99991 81.4605 15.97 54.7167 35.3243 35.3547L48.0522 48.0826C30.6777 65.4571 21.9886 88.228 21.9847 111Z" fill="#FF0508"></path>
+                <path data-expanded="fair" d="M48.0567 48.0567L35.3395 35.3395C56.2271 14.4519 83.602 4.00534 110.978 3.99989V21.9999C86.4073 21.9999 64.1617 31.9571 48.0567 48.0567Z" fill="#FF9045"></path>
+                <path data-expanded="good" d="M111 21.9847V3.99986C140.54 3.99986 167.283 15.97 186.645 35.3243L173.917 48.0522C156.543 30.6777 133.772 21.9885 111 21.9847Z" fill="#FFE16C"></path>
+                <path data-expanded="excellent" d="M173.943 48.0567L186.661 35.3395C207.548 56.2271 217.995 83.6019 218 110.978H200C200 86.4072 190.043 64.1617 173.943 48.0567Z" fill="#6EC959"></path>
+              <text x="100" y="75" font-size="30" fill="var(--text)"               text-anchor="middle">0</text>
+              <text x="100" y="95" font-size="14" fill="var(--text)"               text-anchor="middle">Можно узнать</text>
+            </svg>
+        </div>
       </div>
       <!-- INVEST RATING -->
-    <div class="panel">
-        <h3>Инвестиционный рейтинг <span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="hfnsknk" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z"></path></svg></span></h3>
-        <svg width="222" height="111" viewBox="0 0 222 111" fill="none" xmlns="http://www.w3.org/2000/svg" class="_4PiqhYiUmvG63I7w1b0h" data-qa="invest-rating-ranges-img"><path fill-rule="evenodd" clip-rule="evenodd" d="M208 111C208 57.4284 164.572 14 111 14C57.4284 14 14 57.4284 14 111H22C22 61.8467 61.8467 22 111 22C160.153 22 200 61.8467 200 111H208Z" fill="#DBDBDB"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M198 111C198 62.9512 159.049 24 111 24C62.9512 24 24 62.9512 24 111H26C26 64.0558 64.0558 26 111 26C157.944 26 196 64.0558 196 111H198Z" fill="#C2C7F7"></path><path data-regular="novice" d="M14 111L21.9847 111C21.9886 88.228 30.6777 65.4571 48.0522 48.0826L42.3954 42.4258C24.8508 59.9782 14 84.2219 14 111Z" fill="#E1E3FB"></path><path data-regular="standard" d="M42.4106 42.4106L48.0567 48.0567C64.1617 31.9571 86.4073 21.9999 110.979 21.9999V14C86.1612 14.0055 61.3456 23.4757 42.4106 42.4106Z" fill="#C2C7F7"></path><path data-regular="advanced" d="M111 14L111 21.9847C133.772 21.9886 156.543 30.6777 173.917 48.0522L179.574 42.3954C162.022 24.8508 137.778 14 111 14Z" fill="#A4A2FF"></path><path data-regular="experienced" d="M179.589 42.4106L173.943 48.0567C190.043 64.1617 200 86.4073 200 110.978H208C207.995 86.1612 198.524 61.3456 179.589 42.4106Z" fill="#6A80EF"></path><path data-expanded="novice" d="M21.9847 111H3.99991C3.99991 81.4605 15.97 54.7167 35.3243 35.3547L48.0522 48.0826C30.6777 65.4571 21.9886 88.228 21.9847 111Z" fill="#E1E3FB"></path><path data-expanded-arrow="novice" d="M21.3837 73.8797L32.4101 74.6975L29.7588 81.0983L21.3837 73.8797Z" fill="#3E448C"></path><path data-expanded="standard" d="M48.0567 48.0567L35.3395 35.3395C56.2271 14.4519 83.602 4.00534 110.978 3.99989V21.9999C86.4073 21.9999 64.1617 31.9571 48.0567 48.0567Z" fill="#C2C7F7"></path><path data-expanded-arrow="standard" d="M73.8797 21.3837L81.0983 29.7588L74.6975 32.4101L73.8797 21.3837Z" fill="#3E448C"></path><path data-expanded="experienced" d="M111 21.9847V3.99986C140.54 3.99986 167.283 15.97 186.645 35.3243L173.917 48.0522C156.543 30.6777 133.772 21.9885 111 21.9847Z" fill="#A4A2FF"></path><path data-expanded-arrow="experienced" d="M148.12 21.3837L147.303 32.4101L140.902 29.7588L148.12 21.3837Z" fill="#3E448C"></path><path data-expanded="advanced" d="M173.943 48.0567L186.661 35.3395C207.548 56.2271 217.995 83.6019 218 110.978H200C200 86.4072 190.043 64.1617 173.943 48.0567Z" fill="#6A80EF"></path><path data-expanded-arrow="advanced" d="M200.616 73.8797L192.241 81.0983L189.59 74.6975L200.616 73.8797Z" fill="#3E448C"></path>
-          <text x="100" y="85" font-size="14" fill="var(--purple)" text-anchor="middle">Можно узнать</text>
-        </svg>
+    <div class="panel" id="creditPanel">
+        <h3 class="shapka-card">
+            Инвестиционный рейтинг
+          <span class="arrow">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="hfnsknk" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z"></path>
+            </svg>
+          </span>
+        </h3>
+      
+        <!-- то, что должно прятаться -->
+        <div class="panel-body">
+            <svg width="222" height="111" viewBox="0 0 222 111" fill="none" xmlns="http://www.w3.org/2000/svg" class="_4PiqhYiUmvG63I7w1b0h" data-qa="invest-rating-ranges-img"><path fill-rule="evenodd" clip-rule="evenodd" d="M208 111C208 57.4284 164.572 14 111 14C57.4284 14 14 57.4284 14 111H22C22 61.8467 61.8467 22 111 22C160.153 22 200 61.8467 200 111H208Z" fill="#DBDBDB"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M198 111C198 62.9512 159.049 24 111 24C62.9512 24 24 62.9512 24 111H26C26 64.0558 64.0558 26 111 26C157.944 26 196 64.0558 196 111H198Z" fill="#C2C7F7"></path><path data-regular="novice" d="M14 111L21.9847 111C21.9886 88.228 30.6777 65.4571 48.0522 48.0826L42.3954 42.4258C24.8508 59.9782 14 84.2219 14 111Z" fill="#E1E3FB"></path><path data-regular="standard" d="M42.4106 42.4106L48.0567 48.0567C64.1617 31.9571 86.4073 21.9999 110.979 21.9999V14C86.1612 14.0055 61.3456 23.4757 42.4106 42.4106Z" fill="#C2C7F7"></path><path data-regular="advanced" d="M111 14L111 21.9847C133.772 21.9886 156.543 30.6777 173.917 48.0522L179.574 42.3954C162.022 24.8508 137.778 14 111 14Z" fill="#A4A2FF"></path><path data-regular="experienced" d="M179.589 42.4106L173.943 48.0567C190.043 64.1617 200 86.4073 200 110.978H208C207.995 86.1612 198.524 61.3456 179.589 42.4106Z" fill="#6A80EF"></path><path data-expanded="novice" d="M21.9847 111H3.99991C3.99991 81.4605 15.97 54.7167 35.3243 35.3547L48.0522 48.0826C30.6777 65.4571 21.9886 88.228 21.9847 111Z" fill="#E1E3FB"></path>
+                <path data-expanded="standard" d="M48.0567 48.0567L35.3395 35.3395C56.2271 14.4519 83.602 4.00534 110.978 3.99989V21.9999C86.4073 21.9999 64.1617 31.9571 48.0567 48.0567Z" fill="#C2C7F7"></path>
+                <path data-expanded="experienced" d="M111 21.9847V3.99986C140.54 3.99986 167.283 15.97 186.645 35.3243L173.917 48.0522C156.543 30.6777 133.772 21.9885 111 21.9847Z" fill="#A4A2FF"></path>
+                <path data-expanded="advanced" d="M173.943 48.0567L186.661 35.3395C207.548 56.2271 217.995 83.6019 218 110.978H200C200 86.4072 190.043 64.1617 173.943 48.0567Z" fill="#6A80EF"></path>
+              <text x="100" y="85" font-size="14" fill="var(--purple)" text-anchor="middle">Можно узнать</text>
+            </svg>
+        </div>
       </div>
-  
       <!-- OSAGO -->
       <div class="panel">
         <h3 style="margin:0">Добавьте полис ОСАГО</h3>
@@ -327,16 +694,53 @@ footer{grid-column:1/-1;background:#21242b;color:#fff;padding:80px 40px 40px;fon
     </aside>
   
     <!-- FOOTER -->
-    <footer>
-      <div class="foot-grid">
-        <div class="foot-col"><strong>Перейти на сайт Финуслуг</strong></div>
-        <div class="foot-col"><strong>Позвонить:</strong><a>8 800 505-32-32</a><a>+7 495 145-32-32</a></div>
-        <div class="foot-col"><strong>Написать:</strong><a>service@finuslugi.ru</a></div>
-        <div class="foot-col"><strong>Адрес:</strong><a>Большой Кисловский пер., 13, Москва</a></div>
-        <div class="foot-col"><strong>Социальные сети:</strong><div class="social"><div class="soc-ico">VK</div><div class="soc-ico">TG</div></div></div>
-      </div>
-      <div class="footer-note">© Московская Биржа, 2011–2025. Демонстрационная верстка.</div>
-    </footer>
+    <footer class="footer1">
+        <div class="foot-grid">
+      
+          <!-- 1. Кнопка-ссылка на сайт Финуслуг + иконка -->
+          <div class="foot-col">
+            <a href="https://finuslugi.ru/" class="foot-site">
+              <span class="site-ico"><img src="https://assets.finuslugi.ru/mp-assets/images/footer/redesigned-footer-logo.svg"></span>  <!-- ← сюда вставишь <img> -->
+              Перейти на сайт Финуслуг
+            </a>
+          </div>
+      
+          <!-- 2. Телефоны -->
+          <div class="foot-col">
+            <strong>Позвонить:</strong>
+            <a href="tel:88005053232">8 800 505-32-32</a>
+            <a href="tel:+74951453232">+7 495 145-32-32</a>
+          </div>
+      
+          <!-- 3. Почта -->
+          <div class="foot-col">
+            <strong>Написать:</strong>
+            <a href="mailto:service@finuslugi.ru">service@finuslugi.ru</a>
+          </div>
+      
+          <!-- 4. Адрес -->
+          <div class="foot-col">
+            <strong>Адрес:</strong>
+            <a target="_blank">Большой Кисловский пер., 13,<br>Москва</a>
+          </div>
+      
+          <!-- 5. Соцсети + иконки-кнопки -->
+          <div class="foot-col">
+            <strong>Социальные сети:</strong>
+            <div class="social">
+              <span class="soc-ico"><img src="https://assets.finuslugi.ru/mp-assets/images/sn/logo-vk-icon-redesigned.svg" alt="Официальная группа Вконтакте Финуслуг" loading="lazy"></span>  <!-- VK -->
+              <span class="soc-ico"><img src="https://assets.finuslugi.ru/mp-assets/images/sn/logo-telegram-icon-redesigned.svg" alt="Официальный телеграм-канал Финуслуг" loading="lazy"></span>  <!-- TG -->
+            </div>
+          </div>
+      
+        </div>
+      
+        <!-- ЭТО НЕ ТРОГАЕМ -->
+        <div class="footer-note">
+          © Московская Биржа, 2011–2025. Демонстрационная верстка.
+        </div>
+      </footer>
+      
   
   </div>
   <!-- ========== MODAL HTML ========== -->
@@ -410,6 +814,21 @@ footer{grid-column:1/-1;background:#21242b;color:#fff;padding:80px 40px 40px;fon
       e.preventDefault();
       alert('Параметры отправлены (демо)');
       modal.classList.remove('show');
+    });
+    document.querySelectorAll('.task-panel').forEach(panel=>{
+        const header = panel.querySelector('.tp-header');
+
+        header.addEventListener('click', ()=> {
+            panel.classList.toggle('is-open');
+        });
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+    // ловим все кликабельные заголовки
+    document.querySelectorAll('.panel .shapka-card')
+        .forEach(head => head.addEventListener('click', () => {
+            head.parentElement.classList.toggle('collapsed');
+            console.log(1)
+        }));
     });
   </script>
   </body>
