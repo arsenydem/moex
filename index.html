@@ -107,8 +107,10 @@ header{
 .badge{
   background:var(--dark);color:#fff;border-radius:14px;
   padding:10px 28px;display:flex;align-items:center;gap:14px;
-  font-size:18px;font-weight:500
+  font-size:18px;font-weight:500;
+  justify-content: center;
 }
+
 .badge:hover {
     background:#434343;
     cursor: pointer
@@ -139,7 +141,7 @@ main{padding:36px 32px 80px}
 section{margin-block:40px}
 
 /* STORIES */
-.stories{display:flex;gap:22px;overflow-x:auto;padding-bottom:22px}
+.stories{display:flex;gap:22px;overflow-x:auto;padding-bottom:22px;justify-content: space-evenly}
 .story{flex:0 0 auto;text-align:center;width:98px}
 .ring{width:90px;height:90px;border:3px solid #b3d2ff;border-radius:50%;display:grid;place-items:center}
 .story p{font-size:13px;margin-top:8px}
@@ -231,7 +233,7 @@ h2{font-size:28px;margin-bottom:24px}
 .savings-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .savings-head a{font-size:15px}
 .savings-list{display:flex;flex-direction:column;gap:24px}
-.save-card{display:flex;justify-content:space-between;align-items:center;gap:16px;background:white;border:1px solid var(--border);border-radius:20px;padding:24px;cursor:pointer;margin-bottom:40px}
+.save-card{display:flex;justify-content:space-between;align-items:center;gap:16px;background:white;border:1px solid var(--border);border-radius:20px;padding:24px;cursor:pointer;margin-bottom:5px}
 .save-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.06)}
 .save-card h3{font-size:20px}.save-card small{color:var(--muted)}
 .save-img{width:74px;height:74px;border-radius:12px}
@@ -281,6 +283,36 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
 .modal h2{font-size:28px;margin-bottom:12px}
 .modal p{color:var(--muted);margin-bottom:32px}
 .close-btn{position:absolute;top:18px;right:18px;width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--border);display:grid;place-items:center;font-size:22px;cursor:pointer}
+/* ДОБАВКА К ВАШИМ СТИЛЯМ */
+.step      {animation:fade .2s ease}
+.actions   {display:flex; gap:12px; flex-wrap:wrap; margin-top:18px}
+.btn-light {background:#f2f2f2;color:#000}
+@keyframes fade{from{opacity:0;transform:translateY(10px)} to{opacity:1}}
+
+/* === ДОПОЛНЕНИЕ для опроса ==================================== */
+:root{
+  --accent:#3d7fff;          /* твой бренд-колор */
+  --border:#d9d9d9;
+}
+
+.step-survey h3{margin-bottom:24px}
+.survey-q     {margin-bottom:22px}
+.survey-q label,
+.survey-q legend{display:block;font-weight:600;margin-bottom:8px}
+
+select,
+.survey-q select,
+.survey-q input[type=radio]{
+  accent-color:var(--accent);
+}
+
+select{
+  width:100%;padding:10px 12px;border:1px solid var(--border);
+  border-radius:8px;font-size:15px;background:#fff
+}
+
+.radio-wrap{display:grid;gap:6px;margin-top:6px}
+.radio-wrap input[type=radio]{margin-right:6px}
 
 /* форма */
 .form-group{margin-bottom:26px;font-size:15px}
@@ -291,6 +323,17 @@ input[type=number],input[type=text]{width:100%;padding:12px 14px;border:1px soli
 .range-values{font-size:14px;color:var(--muted)}
 .modal footer{margin-top:32px;text-align:center}
 .btn{background:var(--dark);color:#fff;border:none;border-radius:10px;padding:14px 32px;font-size:16px;cursor:pointer}
+/* === для сообщения результата ============================= */
+.survey-result{
+  margin-top:18px;padding:14px 16px;border-radius:8px;font-size:15px;
+}
+.survey-result.good{
+  background:#e8f6e8;color:#1f7a1f;border:1px solid #c5e6c5;
+}
+.survey-result.bad{
+  background:#ffecec;color:#c0392b;border:1px solid #f5c0bd;
+}
+
 /* ===== universal panel ===== */
 .panel{background:var(--card-bg);border:1px solid #e3e7ec;border-radius:20px;
        padding:26px}
@@ -373,7 +416,7 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
   display:grid;
   grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
   gap:80px;
-  max-width:1400px;
+  max-width:1600px;
   margin:0 auto;
 }
 
@@ -493,10 +536,13 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
 /* ==== ≤1500 – прячем правый ==== */
 @media (max-width:1500px){
   .wrapper{
-    grid-template-columns:280px 1fr;
+    grid-template-columns:320px 1fr;
     grid-template-areas:"left main";
   }
   aside.right{display:none;}
+  main{
+  width:clamp(360px, calc(100vw - 340px), 1160px);
+}
 }
 
 /* ==== ≤1000 – прячем и левый ==== */
@@ -509,78 +555,17 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
   .greeting {
     font-size:24px
   }
+  main{
+  width:clamp(360px, calc(100vw), 1160px);
+}
 }
 
 /* ==== ≤930 – мобилка-косметика ==== */
-@media (max-width:950px){
+@media (max-width:650px){
   header{flex-wrap:wrap;gap:20px;}
   .products{grid-template-columns:1fr;}
-  main {
-    width:935px
-  }
 }
-@media (max-width:900px){
-main {
-  width:885px
-}
-}
-@media (max-width:850px){
-main {
-  width:835px
-}
-}
-@media (max-width:800px){
-main {
-  width:785px
-}
-}
-@media (max-width:750px){
-main {
-  width:735px
-}
-}
-@media (max-width:700px){
 
-  main {
-    width:685px
-  }
-}
-@media (max-width:650px){
-
-main {
-  width:635px
-}
-}
-@media (max-width:600px){
-
-main {
-  width:585px
-}
-}
-@media (max-width:550px){
-
-main {
-  width:535px
-}
-}
-@media (max-width:500px){
-
-main {
-  width:485px
-}
-}
-@media (max-width:450px){
-
-main {
-  width:435px
-}
-}
-@media (max-width:400px){
-
-main {
-  width:385px
-}
-}
 </style>
 </head>
 <body>
@@ -873,77 +858,235 @@ main {
   
   </div>
   <!-- ========== MODAL HTML ========== -->
-<div class="modal-overlay" id="smartModal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <button class="close-btn" aria-label="Закрыть">×</button>
+  <div class="modal-overlay" id="smartModal">
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="close-btn" aria-label="Закрыть" id="closeSmart">×</button>
   
-      <h2 id="modalTitle">Выберите вклад с эксклюзивной ставкой</h2>
-      <p>Собрали топ-варианты для вашего первого депозита — со ставками выше, чем в офисе банка.</p>
+      <!-- ===== ШАГ 1: КРАТКАЯ ИНФА ================================ -->
+      <section class="step" id="step-info">
+        <h2>Привет!</h2>
+        <p>Боишься открывать вклад? Не знаешь, какой банк лучше выбрать?<br>
+           У нас есть для тебя <strong>SmartВклад</strong>.</p>
   
-      <form id="depositForm">
-        <div class="form-group">
-          <label for="monthly">Ежемесячная сумма</label>
-          <input type="number" id="monthly" placeholder="Введите сумму" min="0" step="1000">
+        <p><strong>SmartВклад</strong> — это удобный и безопасный способ приумножить сбережения.
+           Мы автоматически переводим ваши средства на лучшие банковские вклады,
+           анализируя условия и выбирая выгодные ставки. Все деньги защищены
+           государственным страхованием до 1,4 млн ₽. Вы всегда будете в курсе
+           роста капитала благодаря прозрачным отчётам и прогнозам. «SmartВклад»
+           экономит время, обеспечивает гибкость и высокую доходность.</p>
+  
+        <div class="actions">
+          <button class="btn btn-light"   id="toDetails">Подробнее</button>
+          <button class="btn btn-light"   id="toSurvey">Пройти опрос</button>
+          <button class="btn"             id="toForm">Перейти к оформлению</button>
         </div>
+      </section>
   
-        <div class="form-group">
-          <label>Максимальный срок вклада (мес)</label>
-          <div class="range-wrap">
-            <span class="range-values" id="termVal">18</span>
-            <input type="range" id="term" min="0" max="36" value="18">
+      <!-- ===== ШАГ 2: РАСШИРЕННАЯ ИНФА ============================ -->
+      <section class="step" id="step-details" hidden>
+        <p><strong>«SmartВклад» — ваш умный способ сохранить и приумножить сбережения.</strong></p>
+        <p>Мы предлагаем пользователям простое и безопасное решение для регулярного
+           перевода средств на оптимальные банковские вклады с максимальной доходностью.</p>
+        <p><em>Как это работает?</em><br>
+           • Каждый месяц мы автоматически списываем указанную вами сумму.<br>
+           • Анализируем условия банков и выбираем наиболее привлекательные ставки.<br>
+           • Средства распределены по нескольким банкам и застрахованы до 1,4 млн ₽.<br>
+           • Вы всегда видите отчёты о росте капитала.</p>
+        <button class="btn btn-light" id="backInfo1">← Назад</button>
+      </section>
+  
+      <!-- ===== ШАГ 3: ОПРОС ======================================= -->
+      <section class="step step-survey" id="step-survey" hidden>
+        <h3>Быстрый опрос</h3>
+      
+        <form id="surveyForm">
+          <!-- Q1 -->
+          <div class="survey-q">
+            <label for="amountSel">Сколько готовы откладывать ежемесячно?</label>
+            <select id="amountSel" name="amount" required>
+              <option value="" disabled selected>Выберите…</option>
+              <option value="5000">до 5 000 ₽</option>
+              <option value="15000">5 000 – 15 000 ₽</option>
+              <option value="30000">15 000 – 30 000 ₽</option>
+              <option value="50000">30 000 ₽ и более</option>
+            </select>
           </div>
-        </div>
-  
-        <h4 style="margin:32px 0 18px;font-size:17px">Дополнительно</h4>
-  
-        <div class="form-group">
-          <label>Резервная сумма (₽)</label>
-          <div class="range-wrap">
-            <span class="range-values" id="reserveVal">5000</span>
-            <input type="range" id="reserve" min="0" max="10000" value="5000" step="500">
+      
+          <!-- Q2 -->
+          <div class="survey-q">
+            <label for="horizonSel">Горизонт инвестирования</label>
+            <select id="horizonSel" name="horizon" required>
+              <option value="" disabled selected>Выберите…</option>
+              <option>до 6 мес</option>
+              <option>6-12 мес</option>
+              <option>1-3 года</option>
+              <option>3+ года</option>
+            </select>
           </div>
-        </div>
+      
+          <!-- Q3 -->
+          <fieldset class="survey-q">
+            <legend>Что для вас важнее?</legend>
+            <div class="radio-wrap">
+              <label><input type="radio" name="priority" value="rate" required>Максимальная ставка</label>
+              <label><input type="radio" name="priority" value="flex">Гибкость снятия</label>
+              <label><input type="radio" name="priority" value="both">Баланс двух факторов</label>
+            </div>
+          </fieldset>
+      
+          <div class="actions">
+            <button class="btn" type="submit">Готово</button>
+            <button class="btn btn-light" id="backInfo2" type="button">← Назад</button>
+          </div>
+          <div id="surveyResult" class="survey-result" hidden></div>
+        </form>
+      </section>      
   
-        <div class="form-group">
-          <label for="freeze">Период без реинвестирования (дней)</label>
-          <input type="number" id="freeze" placeholder="Введите кол-во дней" min="0">
-        </div>
-  
-        <div class="form-group">
-          <label for="ban">Нежелательные банки</label>
-          <input type="text" id="ban" placeholder="Мы не будем открывать вклад в них">
-        </div>
-  
-        <footer><button class="btn" type="submit">Подобрать вклад</button></footer>
-      </form>
+      <!-- ===== ШАГ 4: ГОТОВАЯ ФОРМА =============================== -->
+      <section class="step" id="step-form" hidden>
+        <h2 id="modalTitle">Выберите вклад с эксклюзивной ставкой</h2>
+        <p>Собрали топ-варианты для вашего первого депозита — со ставками выше, чем в офисе банка.</p>
+  <!-- оригинальная форма без изменений -->
+        <form id="depositForm">
+          <!-- …(оставляем ваш код формы как есть)… -->
+          <!-- ежемесячная сумма -->
+          <div class="form-group">
+            <label for="monthly">Ежемесячная сумма</label>
+            <input type="number" id="monthly" placeholder="Введите сумму" min="0" step="1000">
+          </div>
+          <!-- срок -->
+          <div class="form-group">
+            <label>Максимальный срок вклада (мес)</label>
+            <div class="range-wrap">
+              <span class="range-values" id="termVal">18</span>
+              <input type="range" id="term" min="0" max="36" value="18">
+            </div>
+          </div>
+          <h4 style="margin:32px 0 18px;font-size:17px">Дополнительно</h4>
+          <!-- резерв -->
+          <div class="form-group">
+            <label>Резервная сумма (₽)</label>
+            <div class="range-wrap">
+              <span class="range-values" id="reserveVal">5000</span>
+              <input type="range" id="reserve" min="0" max="10000" value="5000" step="500">
+            </div>
+          </div>
+          <!-- freeze -->
+          <div class="form-group">
+            <label for="freeze">Период без реинвестирования (дней)</label>
+            <input type="number" id="freeze" placeholder="Введите кол-во дней" min="0">
+          </div>
+          <!-- ban -->
+          <div class="form-group">
+            <label for="ban">Нежелательные банки</label>
+            <input type="text" id="ban" placeholder="Мы не будем открывать вклад в них">
+          </div>
+          <footer class="actions">
+            <button class="btn" type="submit">Подобрать вклад</button>
+            <button class="btn btn-light" id="backInfo3" type="button">← Назад</button>
+          </footer>
+        </form>
+      </section>
     </div>
   </div>
+
   <!-- ========== JS ========== -->
 <script>
-    const card  = document.getElementById('smartCard');
-    const modal = document.getElementById('smartModal');
-    const close = modal.querySelector('.close-btn');
-    
-    /* открыть */
-    card.addEventListener('click', ()=> modal.classList.add('show'));
-    /* закрыть */
-    close.addEventListener('click', ()=> modal.classList.remove('show'));
-    modal.addEventListener('click', e=>{ if(e.target===modal) modal.classList.remove('show');});
-    
-    /* range-вывод */
-    const sync = (range, out, suff='')=>{
-      out.textContent = range.value + suff;
-      range.addEventListener('input',()=> out.textContent = range.value + suff);
+        /* === ЭЛЕМЕНТЫ ================================================== */
+    const card   = document.getElementById('smartCard');     // карточка-триггер
+    const modal  = document.getElementById('smartModal');    // оверлей
+    const close  = modal.querySelector('.close-btn');        // крестик
+
+    // «шаги» модалки
+    const steps = {
+    info    : document.getElementById('step-info'),
+    details : document.getElementById('step-details'),
+    survey  : document.getElementById('step-survey'),
+    form    : document.getElementById('step-form')
     };
+
+    /* === УТИЛИТЫ =================================================== */
+    // показать конкретный шаг
+    function show(step){
+    Object.values(steps).forEach(s => s.hidden = true);
+    steps[step].hidden = false;
+    }
+    // синхронизация range → span-отображения
+    const sync = (range, out, suff='')=>{
+    out.textContent = range.value + suff;
+    range.addEventListener('input', ()=> out.textContent = range.value + suff);
+    };
+
+    /* === ОТКРЫТЬ / ЗАКРЫТЬ ========================================= */
+    card .addEventListener('click', ()=>{ modal.classList.add('show'); show('info'); });
+    close.addEventListener('click', ()=> modal.classList.remove('show'));
+    modal.addEventListener('click', e=>{ if (e.target === modal) modal.classList.remove('show'); });
+
+    /* === НАВИГАЦИЯ ПО КНОПКАМ ====================================== */
+    document.getElementById('toDetails').onclick = ()=> show('details');
+    document.getElementById('toSurvey' ).onclick = ()=> show('survey');
+    document.getElementById('toForm'   ).onclick = ()=> show('form');
+    document.getElementById('backInfo1').onclick = ()=> show('info');
+    document.getElementById('backInfo2').onclick = ()=> show('info');
+    document.getElementById('backInfo3').onclick = ()=> show('info');
+
+    /* === ОПРОС: обработка + скоринг ========================== */
+    document.getElementById('surveyForm').addEventListener('submit', e=>{
+    e.preventDefault();
+
+    const f        = e.target;                        // форма
+    const amount   = +f.amount.value;                 // число
+    const horizon  = f.horizon.value;                 // строка
+    const priority = f.priority.value;                // rate | flex | both
+    const resBox   = document.getElementById('surveyResult');
+
+    /* ------ простейшая «экспертная система» ------------- */
+    // Подходит, если: ежемес. взнос ≤ 30k  И  (приоритет ставка/баланс)
+    // При взносе >30k — только если цель «макс ставка» и горизонт ≤3г
+    let ok;
+
+    if (amount <= 30000){
+        ok = (priority !== 'flex');                      // ставка или баланс
+    } else {
+        ok = (priority === 'rate') && (horizon !== '3+ года');
+    }
+
+    /* ------ выводим ответ -------------------------------- */
+    resBox.hidden = false;
+    resBox.className = 'survey-result ' + (ok ? 'good' : 'bad');
+
+    if (ok){
+        resBox.innerHTML = `
+        👍 <strong>SmartВклад подходит вам.</strong><br>
+        Вы получите лучшие ставки при минимальных усилиях.
+        <br><br>
+        <button id="resultToForm" class="btn" style="margin-top:8px">
+            Перейти к оформлению
+        </button>`;
+    } else{
+        resBox.innerHTML = `
+        👀 <strong>SmartВклад сейчас не оптимален.</strong><br>
+        Попробуйте увеличить горизонт или выбрать
+        вариант с фиксированной ставкой в банке.`;
+    }
+
+    /* ------ навешиваем кнопку «Перейти…», если она есть --- */
+    const cta = document.getElementById('resultToForm');
+    if (cta) cta.onclick = ()=> show('form');
+    });
+
+
+    /* === RANGE-ПОЛЗУНКИ =========================================== */
     sync(document.getElementById('term'),    document.getElementById('termVal'));
     sync(document.getElementById('reserve'), document.getElementById('reserveVal'));
-    
-    /* demo submit */
+
+    /* === SUBMIT ФИНАЛЬНОЙ ФОРМЫ (демо) ============================ */
     document.getElementById('depositForm').addEventListener('submit', e=>{
-      e.preventDefault();
-      alert('Параметры отправлены (демо)');
-      modal.classList.remove('show');
+    e.preventDefault();
+    alert('Параметры отправлены (демо)');
+    modal.classList.remove('show');
     });
+
     document.querySelectorAll('.task-panel').forEach(panel=>{
         const header = panel.querySelector('.tp-header');
 
@@ -956,7 +1099,6 @@ main {
     document.querySelectorAll('.panel .shapka-card')
         .forEach(head => head.addEventListener('click', () => {
             head.parentElement.classList.toggle('collapsed');
-            console.log(1)
         }));
     });
   </script>
