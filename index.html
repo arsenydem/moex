@@ -228,6 +228,188 @@ h2{font-size:28px;margin-bottom:24px}
   width:84px;height:84px;
   border-radius:12px
 }
+/* === Smart-вклад ================================================== */
+.card.smart{
+  cursor:pointer;                 /* 1.  Рука при наведении      */
+  background:var(--card-bg,#fff8e6);
+  border-color:#ffcd66;
+}
+
+.card.smart.full{grid-column:1/-1;}  /* 4. Полная ширина           */
+
+/* === Общий стиль диалогов ======================================== */
+/* === ОБЩИЙ СТИЛЬ ДЛЯ ВСЕХ dialog .dlg ==================== */
+.dlg{
+  /* центрируем намертво */
+  position:fixed !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%,-50%) !important;
+  margin:0;                   /* нативные диалоги любят margin:auto — убираем */
+
+  /* коробка */
+  width:clamp(300px,90vw,520px);
+  max-height:90vh;            /* длинный контент скроллится внутри */
+  overflow-y:auto;
+  padding:32px;
+  border:none;
+  border-radius:16px;
+  background: #e7e7e7;         /* тот самый тёмно-серый с твоего скрина */
+  color:#1b1b1d;
+  box-shadow:0 18px 48px rgba(0,0,0,.45);
+  z-index:2000;               /* поверх smartModal */
+  font-size:15px;
+}
+
+/* backdrop у native-dialog делаем полупрозрачным — и больше ничего не нужно */
+.dlg::backdrop{
+  background:rgba(0,0,0,.55);
+}
+
+/* === СПЕЦИФИКА ДЛЯ КАЖДОГО ТИПА ========================= */
+
+/* Alert-ok */
+.dlg-alert{
+  width:clamp(260px,80vw,360px);
+  text-align:center;
+  padding:26px;
+}
+.dlg-alert .dlg-close{
+  margin-top:24px;
+  width:100%;
+}
+
+/* Подробная инфа */
+.dlg-info h2{margin:0 0 24px;font-size:28px;line-height:1.2;}
+.info-list{margin:0 0 32px;padding:0;list-style:none;}
+.info-list li{margin:8px 0;line-height:1.4;}
+.info-actions .close-deposit{width:100%;}
+
+/* Минимальный confirm */
+.dlg-actions{
+  display:flex;gap:14px;justify-content:flex-end;margin-top:24px;
+}
+.dlg-actions .btn-dark{background:#ff3344;color:#fff;}
+.dlg-actions .btn{background: #e7e7e7;color:#363636;}
+
+/* Крестик для dlg-info */
+.dlg-x{
+  position:absolute;right:16px;top:16px;
+  width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid #555;border-radius:50%;
+  background:#e7e7e7;
+  font-size:24px;line-height:1;
+  cursor:pointer;
+}
+
+.info-actions .close-deposit{width:100%}
+
+/* ====== КАРТОЧКА Smart-вклада ====== */
+.card.smart{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding:20px 24px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 4px 14px rgba(0,0,0,.1);
+  cursor:pointer;
+  transition:box-shadow .2s;
+}
+.card.smart:hover{box-shadow:0 6px 18px rgba(0,0,0,.16);}
+
+.card.smart .card-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  font-weight:600;
+  font-size:18px;
+}
+
+.card.smart .amount{           /* итоговая сумма */
+  font-size:28px;
+  font-weight:700;
+  line-height:1.1;
+  margin-top:4px;
+}
+
+/* ====== ОВЕРЛЕЙ + МОДАЛКА ====== */
+.modal-overlay{
+  position:fixed; inset:0;
+  display:none;                 /* .show → flex */
+  align-items:center;           /* центр по вертикали */
+  justify-content:center;       /* центр по горизонтали */
+  background:rgba(0,0,0,.55);
+  z-index:1000;
+}
+.modal-overlay.show{display:flex;}
+
+.modal{                         /* само «окно» */
+  position:relative;
+  width:clamp(320px, 92%, 760px);
+  max-height:90vh;
+  overflow-y:auto;              /* ⬅️ если текста много, скроллим только окно */
+  padding:32px 42px 40px;
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 18px 48px rgba(0,0,0,.25);
+}
+
+.close-btn{
+  position:absolute;
+  top:16px; right:16px;
+  width:38px; height:38px;
+  border-radius:50%;
+  border:1px solid #ccc;
+  background:#fff;
+  font-size:26px;
+  line-height:1;
+  cursor:pointer;
+}
+
+/* ====== СТУПЕНИ/ШАГИ ВНУТРИ МОДАЛКИ ====== */
+.step{animation:fadeln .25s ease;}
+@keyframes fadeln{from{opacity:0;transform:translateY(8px);}}
+
+/* простенькие кнопки */
+.btn{
+  padding:10px 18px;
+  border:none;
+  border-radius:8px;
+  background:#222;
+  color:#fff;
+  font-weight:600;
+}
+.btn-light{
+  background:#f6f6f6;
+  color:#222;
+}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;}
+
+.form-group{margin-bottom:22px;}
+.form-group label{display:block;margin-bottom:6px;font-weight:600;}
+.range-wrap{display:flex;align-items:center;gap:12px;}
+.range-values{min-width:48px;text-align:right;font-variant-numeric:tabular-nums;}
+
+/* чуть-чуть стиля для выпадашек/инпутов — чтобы не выглядело «сырцом» */
+select, input[type="number"]{
+  width:100%; padding:10px 12px;
+  border:1px solid #ddd; border-radius:6px;
+  font:inherit;
+}
+input[type="range"]{flex:1;}
+
+/* ОБНОВИ: строго “position:fixed + flex-центровка” */
+#smartModal.modal-overlay{
+  position:fixed !important;   /* поверх всего */
+  inset:0 !important;          /* занимает 100 % окна */
+  display:flex !important;     /* ← центровка flexом */
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.55);  /* полупрозрачный фон */
+  z-index:1000;
+}
 
 /* SAVINGS */
 .savings-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
@@ -566,9 +748,140 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
   .products{grid-template-columns:1fr;}
 }
 
+/* ====== СКРОЛЛ ВНУТРИ dialog ========================= */
+/* ---------- dialog ---------- */
+.dlg-info{max-height:90vh;overflow-y:auto;padding:32px 36px;}
+.bank-name{margin:0 0 14px;font-size:15px;opacity:.7;font-weight:600;}
+.headline{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:26px;}
+.head-col{flex:1 1 140px;text-align:center;}
+.head-col small{display:block;font-size:12px;opacity:.6;margin-bottom:4px;}
+.big{margin:0;font-size:28px;font-weight:700;}
+.sub{display:block;font-size:13px;opacity:.6;}
+
+.metrics-grid{display:grid;grid-template-columns:repeat(2,minmax(140px,1fr));gap:16px;margin-bottom:26px;}
+.metric{background:#f6f6f6;border-radius:12px;padding:14px;text-align:center;}
+.metric small{display:block;font-size:11px;opacity:.6;margin-bottom:6px;}
+.metric .val{font-size:18px;font-weight:600;}
+
+.tg-achv{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:30px;}
+.tg-col h3{margin:0 0 10px;font-size:14px;}
+.goal-list,.achv-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.goal-list li,.achv-list li{background:#ececec;border-radius:12px;padding:8px 10px;font-size:13px;}
+
+.dual-actions{display:flex;gap:12px;}
+.dual-actions .btn-grey,.dual-actions .btn-dark{flex:1;}
+
+/* ---------- карточка до клика ---------- */
+.card.smart{display:flex;flex-direction:column;gap:16px;padding:20px 22px;background:#fff;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,.1);cursor:pointer;transition:box-shadow .15s;}
+.card.smart:hover{box-shadow:0 6px 16px rgba(0,0,0,.12);}
+.c-head{display:flex;justify-content:space-between;align-items:center;}
+/* стрелка и «рамка» больше не нужны */
+.c-title{
+  margin:0;
+  font-weight:600;
+  font-size:18px;
+}
+/* удалён .c-arrow, а у .card.smart никакой обводки вокруг заголовка больше нет */
+
+.c-arrow{font-size:24px;line-height:1;}
+.c-balance{margin:0;font-size:30px;font-weight:700;}
+.c-meta{display:flex;gap:12px;}
+.c-meta div{flex:1;background:#f6f6f6;border-radius:10px;padding:10px;text-align:center;}
+.c-meta small{display:block;font-size:11px;opacity:.6;margin-bottom:4px;}
+
+
+.close-disclaimer{
+  display:block;
+  margin:18px 0 0;
+  font-size:13px;
+  line-height:1.45;
+  cursor:pointer;
+}
+.close-disclaimer input{margin-right:8px;vertical-align:middle;}
+
 </style>
 </head>
 <body>
+
+<!-- === Модалка-алерт после оформления ============================= -->
+<dialog id="dlg-alert" class="dlg dlg-alert">
+  <p>Параметры отправлены! Мы подобрали для вас Smart-вклад.</p>
+  <button class="btn-dark dlg-close" type="button">ОК</button>
+</dialog>
+<!-- === Модалка с подробной инфой по вкладу ======================== -->
+<dialog id="dlg-info" class="dlg dlg-info">
+  <button class="dlg-x" aria-label="Закрыть">×</button>
+
+<!-- 0. Банк -->
+<p class="bank-name" data-field="bank"></p>
+
+<!-- 1. Верхняя строка: сумма + доход -->
+<section class="headline">
+  <div class="head-col">
+    <small>Текущая сумма</small>
+    <p class="big" data-field="sum">105 000 ₽</p>
+  </div>
+  <div class="head-col">
+    <small>Ожидаемый доход</small>
+    <p class="big" data-field="income">125 000 ₽</p>
+    <span class="sub" data-field="incomeDelta">(+20 000 ₽)</span>
+  </div>
+  
+</section>
+
+<!-- 2. 2×2 метрики -->
+<section class="metrics-grid">
+  <div class="metric">
+    <small>Текущих вкладов</small><span class="val" data-field="count"></span>
+  </div>
+  <div class="metric">
+    <small>Макс. срок</small><span class="val" data-field="max"></span>
+  </div>
+  <div class="metric">
+    <small>Ближайшее завершение</small><span class="val" data-field="end"></span>
+  </div>
+  <div class="metric">
+    <small>Следующее списание</small><span class="val" data-field="next"></span>
+  </div>
+</section>
+
+<!-- 3. Цели / ачивки -->
+<section class="tg-achv">
+  <div class="tg-col">
+    <h3>Цели</h3>
+    <ul class="goal-list">
+      <li>Накопить 150 000 ₽ на машину</li>
+    </ul>    
+  </div>
+  <div class="tg-col">
+    <h3>Достижения</h3>
+    <ul class="achv-list" data-field="achv"></ul>
+  </div>
+</section>
+
+<!-- 4. Две кнопки -->
+<footer class="dual-actions">
+  <button class="btn-grey close-deposit" type="button">Закрыть вклад</button>
+  <button class="btn-dark" type="button">Пополнить вклад</button>
+</footer>
+
+</dialog>    
+<!-- == Диалог подтверждения закрытия =================== -->
+<dialog id="dlg-close" class="dlg">
+  <p>Вы уверены, что хотите закрыть вклад?<br>
+     Деньги вернутся на кошелек, проценты обнулятся.</p>
+
+  <label class="close-disclaimer">
+    <input type="checkbox" id="closeAgree">
+    Я подтверждаю, что&nbsp;ознакомлен(а) с&nbsp;условиями,
+    понимаю, что&nbsp;проценты сгорят, и&nbsp;согласен(на) на&nbsp;закрытие вклада.
+  </label>
+
+  <div class="dlg-actions">
+    <button class="btn-dark dlg-ok" disabled>Да, закрыть</button>
+    <button class="btn dlg-cancel">Отмена</button>
+  </div>
+</dialog>
 
 <div class="wrapper">
 
@@ -701,6 +1014,7 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
               <img class="banner-fkfksks" src="https://assets.finuslugi.ru/mp-emailmarketing/icon1_gift_200x200.png"
                    alt="Бонус до 1000 ₽ на ОСАГО!">
             </div>
+            
           </div>
         </div>
       </section>
@@ -987,120 +1301,263 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
           </footer>
         </form>
       </section>
+      <!-- === Шаблон «Smart-вклад» =========================== -->
+      <template id="tpl-smart">
+        <div class="card smart">
+          <p class="c-title">Smart-вклад</p>
+      
+          <!-- текущая сумма -->
+          <p class="c-balance" data-el="sum">0 ₽</p>
+      
+          <!-- две мини-плашки -->
+          <div class="c-meta">
+            <div><small>Доход</small><span data-el="income">0 ₽</span></div>
+            <div><small>Вкладов</small><span data-el="count">0</span></div>
+          </div>
+        </div>
+      </template>
+      
+      
+      
+
     </div>
   </div>
 
   <!-- ========== JS ========== -->
 <script>
-        /* === ЭЛЕМЕНТЫ ================================================== */
-    const card   = document.getElementById('smartCard');     // карточка-триггер
-    const modal  = document.getElementById('smartModal');    // оверлей
-    const close  = modal.querySelector('.close-btn');        // крестик
+/* ====================================================================
+   Smart-вклад — единый скрипт
+   ==================================================================== */
 
-    // «шаги» модалки
-    const steps = {
-    info    : document.getElementById('step-info'),
-    details : document.getElementById('step-details'),
-    survey  : document.getElementById('step-survey'),
-    form    : document.getElementById('step-form')
-    };
+document.addEventListener('DOMContentLoaded', () => {
 
-    /* === УТИЛИТЫ =================================================== */
-    // показать конкретный шаг
-    function show(step){
-    Object.values(steps).forEach(s => s.hidden = true);
-    steps[step].hidden = false;
-    }
-    // синхронизация range → span-отображения
-    const sync = (range, out, suff='')=>{
-    out.textContent = range.value + suff;
-    range.addEventListener('input', ()=> out.textContent = range.value + suff);
-    };
+/* --------------------------------------------------------------------
+   0.  Быстрые хелперы
+   -------------------------------------------------------------------- */
+const $  = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+const addDays = (d, n) => {
+  const date = new Date(d);
+  date.setDate(date.getDate() + n);
+  return date.toLocaleDateString('ru-RU');
+};
 
-    /* === ОТКРЫТЬ / ЗАКРЫТЬ ========================================= */
-    card .addEventListener('click', ()=>{ modal.classList.add('show'); show('info'); });
-    close.addEventListener('click', ()=> modal.classList.remove('show'));
-    modal.addEventListener('click', e=>{ if (e.target === modal) modal.classList.remove('show'); });
+/* --------------------------------------------------------------------
+   1.  «Большая» модалка smartModal (шаги info / details / survey / form)
+   -------------------------------------------------------------------- */
+const smartCard  = $('#smartCard');
+console.log(smartCard)      // триггер-карточка
+const smartModal = $('#smartModal');     // затемнённый оверлей
+const smartClose = smartModal.querySelector('.close-btn');
 
-    /* === НАВИГАЦИЯ ПО КНОПКАМ ====================================== */
-    document.getElementById('toDetails').onclick = ()=> show('details');
-    document.getElementById('toSurvey' ).onclick = ()=> show('survey');
-    document.getElementById('toForm'   ).onclick = ()=> show('form');
-    document.getElementById('backInfo1').onclick = ()=> show('info');
-    document.getElementById('backInfo2').onclick = ()=> show('info');
-    document.getElementById('backInfo3').onclick = ()=> show('info');
+const steps = {
+  info   : $('#step-info'),
+  details: $('#step-details'),
+  survey : $('#step-survey'),
+  form   : $('#step-form')
+};
 
-    /* === ОПРОС: обработка + скоринг ========================== */
-    document.getElementById('surveyForm').addEventListener('submit', e=>{
-    e.preventDefault();
+function showStep(key){
+  Object.values(steps).forEach(s => s.hidden = true);
+  steps[key].hidden = false;
+}
 
-    const f        = e.target;                        // форма
-    const amount   = +f.amount.value;                 // число
-    const horizon  = f.horizon.value;                 // строка
-    const priority = f.priority.value;                // rate | flex | both
-    const resBox   = document.getElementById('surveyResult');
+/* открытие / закрытие оверлея */
+smartCard.addEventListener('click', () => {
+  smartModal.classList.add('show');
+  showStep('info');
+});
+smartClose.addEventListener('click', () =>
+  smartModal.classList.remove('show'));
+smartModal.addEventListener('click', e=>{
+  if (e.target === smartModal) smartModal.classList.remove('show');
+});
 
-    /* ------ простейшая «экспертная система» ------------- */
-    // Подходит, если: ежемес. взнос ≤ 30k  И  (приоритет ставка/баланс)
-    // При взносе >30k — только если цель «макс ставка» и горизонт ≤3г
-    let ok;
+/* навигация по кнопкам */
+$('#toDetails').onclick = () => showStep('details');
+$('#toSurvey' ).onclick = () => showStep('survey');
+$('#toForm'   ).onclick = () => showStep('form');
+$('#backInfo1').onclick =
+$('#backInfo2').onclick =
+$('#backInfo3').onclick = () => showStep('info');
 
-    if (amount <= 30000){
-        ok = (priority !== 'flex');                      // ставка или баланс
-    } else {
-        ok = (priority === 'rate') && (horizon !== '3+ года');
-    }
+/* --------------------------------------------------------------------
+   2.  range-ползунки в форме
+   -------------------------------------------------------------------- */
+function sync(range, out, suff = ''){
+  out.textContent = range.value + suff;
+  range.addEventListener('input',
+    () => out.textContent = range.value + suff);
+}
+sync($('#term'),    $('#termVal'));
+sync($('#reserve'), $('#reserveVal'));
 
-    /* ------ выводим ответ -------------------------------- */
-    resBox.hidden = false;
-    resBox.className = 'survey-result ' + (ok ? 'good' : 'bad');
+/* --------------------------------------------------------------------
+   3.  быстрый опрос
+   -------------------------------------------------------------------- */
+$('#surveyForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const f   = e.target;
+  const amt = +f.amount.value;
+  const hor = f.horizon.value;
+  const pri = f.priority.value;
+  const box = $('#surveyResult');
 
-    if (ok){
-        resBox.innerHTML = `
-        👍 <strong>SmartВклад подходит вам.</strong><br>
-        Вы получите лучшие ставки при минимальных усилиях.
-        <br><br>
-        <button id="resultToForm" class="btn" style="margin-top:8px">
-            Перейти к оформлению
-        </button>`;
-    } else{
-        resBox.innerHTML = `
-        👀 <strong>SmartВклад сейчас не оптимален.</strong><br>
-        Попробуйте увеличить горизонт или выбрать
-        вариант с фиксированной ставкой в банке.`;
-    }
+  let ok = (amt <= 30000)
+           ? (pri !== 'flex')
+           : (pri === 'rate' && hor !== '3+ года');
 
-    /* ------ навешиваем кнопку «Перейти…», если она есть --- */
-    const cta = document.getElementById('resultToForm');
-    if (cta) cta.onclick = ()=> show('form');
+  box.hidden = false;
+  box.className = 'survey-result ' + (ok ? 'good' : 'bad');
+  box.innerHTML = ok
+    ? `👍 <strong>SmartВклад подходит вам.</strong><br>
+       Вы получите лучшие ставки при минимальных усилиях.<br><br>
+       <button id="resultToForm" class="btn" style="margin-top:8px">
+         Перейти к оформлению
+       </button>`
+    : `👀 <strong>SmartВклад сейчас не оптимален.</strong><br>
+       Попробуйте увеличить горизонт или выбрать
+       вариант с фиксированной ставкой в банке.`;
+
+  $('#resultToForm')?.addEventListener('click', () => showStep('form'));
+});
+
+/* --------------------------------------------------------------------
+   4.  аккордеоны / панели (если используются)
+   -------------------------------------------------------------------- */
+$$('.task-panel').forEach(panel=>{
+  panel.querySelector('.tp-header')
+       .addEventListener('click',
+         () => panel.classList.toggle('is-open'));
+});
+$$('.panel .shapka-card').forEach(head=>{
+  head.addEventListener('click',
+    () => head.parentElement.classList.toggle('collapsed'));
+});
+/* --------------------------------------------------------------------
+   5.  создание карточки Smart-вклада по submit формы
+   -------------------------------------------------------------------- */
+   const form     = $('#depositForm');
+const tplSmart = $('#tpl-smart');
+const products = $('.products');
+const banner   = $('.banner');
+
+const dlgAlert = $('#dlg-alert');
+dlgAlert.querySelector('.dlg-close')
+        .addEventListener('click', () => dlgAlert.close());
+
+const dlgInfo  = $('#dlg-info');
+const dlgClose = $('#dlg-close');
+
+const agreeBox = $('#closeAgree');
+const btnYes   = dlgClose.querySelector('.dlg-ok');
+const btnCancelClose = dlgClose.querySelector('.dlg-cancel');
+
+let pendingCard = null; // текущая выбранная карточка для действий
+
+form.addEventListener('submit', e=>{
+  e.preventDefault();
+
+  /* ----- данные формы ----- */
+  const monthly = +$('#monthly').value || 0;
+  const term    = +$('#term').value    || 0;
+  const sum     = monthly * term;
+  const today   = new Date();
+
+  /* ----- создаём DOM-узел ----- */
+  const card = tplSmart.content.firstElementChild.cloneNode(true);
+
+  /* фин-расчёты */
+  const income      = sum * 0.12;
+  const incomeDelta = sum * 0.02;
+
+  /* dataset — хранит ВСЕ данные для info-диалога */
+  Object.assign(card.dataset, {
+    bank   : 'Банк «Ракета»',
+    sum    : sum.toLocaleString('ru-RU') + ' ₽',
+    income : (sum + income).toLocaleString('ru-RU') + ' ₽',
+    incomeDelta : '(+' + incomeDelta.toLocaleString('ru-RU') + ' ₽)',
+    count  : '4',
+    max    : term + ' мес',
+    end    : addDays(today, term*30),
+    next   : addDays(today, 30),
+    goals  : 'Накопить 150 000 ₽ на машину',
+    achv   : 'Самурай|Вин-стрик'
+  });
+
+  /* отображаем данные на карточке */
+  card.querySelector('[data-el="sum"]').textContent    = card.dataset.sum;
+  card.querySelector('[data-el="income"]').textContent = income.toLocaleString('ru-RU') + ' ₽';
+  card.querySelector('[data-el="count"]').textContent  = card.dataset.count;
+
+  /* клик по карточке => открываем подробную инфу */
+  card.addEventListener('click', () => openInfo(card));
+
+  /* вставляем в поток */
+  products.insertBefore(card, banner);
+
+  /* закрываем форму-оверлей и показываем alert */
+  smartModal.classList.remove('show');
+  dlgAlert.showModal();
+});
+
+/* --------------------------------------------------------------------
+   6.  подробная инфа по вкладy
+   -------------------------------------------------------------------- */
+function openInfo(card){
+  pendingCard = card;
+
+  // простые <span data-field>
+  ['bank','sum','income','incomeDelta','count','max','end','next']
+    .forEach(key=>{
+      const el = dlgInfo.querySelector(`[data-field="${key}"]`);
+      if (el) el.textContent = card.dataset[key] || '—';
     });
 
+  // цели / ачивки
+  dlgInfo.querySelector('.goal-list').innerHTML =
+    (card.dataset.goals||'')
+      .split('|').filter(Boolean).map(t=>`<li>${t}</li>`).join('');
+  dlgInfo.querySelector('.achv-list').innerHTML =
+    (card.dataset.achv||'')
+      .split('|').filter(Boolean).map(t=>`<li>${t}</li>`).join('');
 
-    /* === RANGE-ПОЛЗУНКИ =========================================== */
-    sync(document.getElementById('term'),    document.getElementById('termVal'));
-    sync(document.getElementById('reserve'), document.getElementById('reserveVal'));
+  dlgInfo.showModal();
+}
 
-    /* === SUBMIT ФИНАЛЬНОЙ ФОРМЫ (демо) ============================ */
-    document.getElementById('depositForm').addEventListener('submit', e=>{
-    e.preventDefault();
-    alert('Параметры отправлены (демо)');
-    modal.classList.remove('show');
-    });
+/* закрытие info по крестику */
+dlgInfo.querySelector('.dlg-x')
+       .addEventListener('click', () => dlgInfo.close());
 
-    document.querySelectorAll('.task-panel').forEach(panel=>{
-        const header = panel.querySelector('.tp-header');
+/* --------------------------------------------------------------------
+   7.  процесс закрытия вклада
+   -------------------------------------------------------------------- */
 
-        header.addEventListener('click', ()=> {
-            panel.classList.toggle('is-open');
-        });
-    });
-    document.addEventListener('DOMContentLoaded', () => {
-    // ловим все кликабельные заголовки
-    document.querySelectorAll('.panel .shapka-card')
-        .forEach(head => head.addEventListener('click', () => {
-            head.parentElement.classList.toggle('collapsed');
-        }));
-    });
+/* шаг 1 — кнопка «Закрыть вклад» внутри dlg-info */
+dlgInfo.querySelector('.close-deposit')
+       .addEventListener('click', () => {
+         dlgInfo.close();
+         agreeBox.checked = false;
+         btnYes.disabled  = true;
+         dlgClose.showModal();
+       });
+
+/* шаг 2 — чекбокс включает «Да, закрыть» */
+agreeBox.addEventListener('change',
+  () => btnYes.disabled = !agreeBox.checked);
+
+/* шаг 3 — подтверждение */
+btnYes.addEventListener('click', () => {
+  pendingCard?.remove();
+  dlgClose.close();
+  pendingCard = null;
+});
+/* шаг 4 — отмена */
+btnCancelClose.addEventListener('click', () => dlgClose.close());
+dlgClose.querySelector('.dlg-close')
+        .addEventListener('click', () => dlgClose.close());
+
+}); // DOMContentLoaded
   </script>
   </body>
   </html>
