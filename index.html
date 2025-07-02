@@ -8,7 +8,7 @@
 /* -------- переменные -------- */
 :root{
   --bg:#f1f3f5;           --header-bg:#e6eaee;
-  --card-bg:#fff;         --border:#e1e3e6;
+  --card-bg:#fff;         --border:#a1a2a4;
   --text:#1d1d1f;         --muted:#6c6d70;
   --dark:#13151b;         --red:#ff0000;
   --orange:#f77a24;       --yellow:#ffd95b;
@@ -20,9 +20,7 @@ html, body{
   overflow-y:auto;     /* обязательно, иначе скролла нет */
 }
 
-#ban::placeholder {
-    font-size:12px
-}
+
 .storyes {
     border-radius: 50%
 }
@@ -202,12 +200,21 @@ h2{font-size:28px;margin-bottom:24px}
 /* кнопки как были */
 .btn-dark,.btn-grey{
   width:100%;
-  margin-top:20px;
   padding:14px;
   border:none;
   border-radius:8px;
+  margin-top:20px;
   font-size:16px;
   cursor:pointer
+}
+
+.btn-dark-new {
+  width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
 }
 .btn-dark{background:var(--dark);color:#fff}
 .btn-grey{background:#dee2e7;color:var(--text)}
@@ -283,27 +290,26 @@ h2{font-size:28px;margin-bottom:24px}
 .dlg-info h2{margin:0 0 24px;font-size:28px;line-height:1.2;}
 .info-list{margin:0 0 32px;padding:0;list-style:none;}
 .info-list li{margin:8px 0;line-height:1.4;}
-.info-actions .close-deposit{width:100%;}
 
 /* Минимальный confirm */
 .dlg-actions{
   display:flex;gap:14px;justify-content:flex-end;margin-top:24px;
 }
-.dlg-actions .btn-dark{background:#ff3344;color:#fff;}
+.dlg-actions .btn-dark-new{background:#ff3344;color:#fff;}
 .dlg-actions .btn{background: #e7e7e7;color:#363636;}
 
 /* Крестик для dlg-info */
 .dlg-x{
   position:absolute;right:16px;top:16px;
-  width:36px;height:36px;
+  width:44px;height:44px;
   display:flex;align-items:center;justify-content:center;
-  border:1px solid #555;border-radius:50%;
+  border:1px solid var(--borderbtn);
+  border-radius:50%;
   background:#e7e7e7;
   font-size:24px;line-height:1;
   cursor:pointer;
 }
 
-.info-actions .close-deposit{width:100%}
 
 /* ====== КАРТОЧКА Smart-вклада ====== */
 .card.smart{
@@ -356,17 +362,7 @@ h2{font-size:28px;margin-bottom:24px}
   box-shadow:0 18px 48px rgba(0,0,0,.25);
 }
 
-.close-btn{
-  position:absolute;
-  top:16px; right:16px;
-  width:38px; height:38px;
-  border-radius:50%;
-  border:1px solid #ccc;
-  background:#fff;
-  font-size:26px;
-  line-height:1;
-  cursor:pointer;
-}
+
 
 /* ====== СТУПЕНИ/ШАГИ ВНУТРИ МОДАЛКИ ====== */
 .step{animation:fadeln .25s ease;}
@@ -464,7 +460,7 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
 .modal{background:#fff;border-radius:16px;max-width:880px;width:90%;max-height:90vh;overflow:auto;padding:40px 48px;position:relative;box-shadow:0 14px 32px rgba(0,0,0,.18)}
 .modal h2{font-size:28px;margin-bottom:12px}
 .modal p{color:var(--muted);margin-bottom:32px}
-.close-btn{position:absolute;top:18px;right:18px;width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--border);display:grid;place-items:center;font-size:22px;cursor:pointer}
+.close-btn{position:absolute;top:18px;right:18px;width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--borderbtn);display:grid;place-items:center;font-size:22px;cursor:pointer}
 /* ДОБАВКА К ВАШИМ СТИЛЯМ */
 .step      {animation:fade .2s ease}
 .actions   {display:flex; gap:12px; flex-wrap:wrap; margin-top:18px}
@@ -475,6 +471,7 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
 :root{
   --accent:#3d7fff;          /* твой бренд-колор */
   --border:#d9d9d9;
+  --borderbtn:#acacac;
 }
 
 .step-survey h3{margin-bottom:24px}
@@ -715,6 +712,9 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
   min-height:100vh;
 }
 
+.dlg-cancel {
+  border: 1px solid var(--borderbtn)
+}
 /* ==== ≤1500 – прячем правый ==== */
 @media (max-width:1500px){
   .wrapper{
@@ -724,6 +724,9 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
   aside.right{display:none;}
   main{
   width:clamp(360px, calc(100vw - 340px), 1160px);
+}
+#ban::placeholder {
+    font-size:15px
 }
 }
 
@@ -740,6 +743,9 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
   main{
   width:clamp(360px, calc(100vw), 1160px);
 }
+#ban::placeholder {
+    font-size:12px
+}
 }
 
 /* ==== ≤930 – мобилка-косметика ==== */
@@ -750,7 +756,7 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
 
 /* ====== СКРОЛЛ ВНУТРИ dialog ========================= */
 /* ---------- dialog ---------- */
-.dlg-info{max-height:90vh;overflow-y:auto;padding:32px 36px;}
+.dlg-info{max-height:90vh;overflow-y:auto;padding: 60px 35px 25px 35px}
 .bank-name{margin:0 0 14px;font-size:15px;opacity:.7;font-weight:600;}
 .headline{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:26px;}
 .head-col{flex:1 1 140px;text-align:center;}
@@ -771,8 +777,24 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
 .dual-actions{display:flex;gap:12px;}
 .dual-actions .btn-grey,.dual-actions .btn-dark{flex:1;}
 
+.info-actions .close-deposit{width:100%}
+.dual-actions .close-deposit{width:100%; background:#b3b8bc}
+
 /* ---------- карточка до клика ---------- */
-.card.smart{display:flex;flex-direction:column;gap:16px;padding:20px 22px;background:#fff;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,.1);cursor:pointer;transition:box-shadow .15s;}
+.card.smart{
+  display:flex;
+  flex-direction:column;
+  gap:16px;padding:20px 22px;
+  background:#fff;
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+  cursor:pointer;
+  transition:box-shadow .15s;
+  border:2px solid #00A1E9;          /* фирменный голубой */
+  background:linear-gradient(135deg,#E9F9FF 0%,#FFFFFF 60%);
+  transition:transform .2s,box-shadow .2s;
+  animation:pulseBorder 2s infinite; /* пульсующая рамка */
+}
 .card.smart:hover{box-shadow:0 6px 16px rgba(0,0,0,.12);}
 .c-head{display:flex;justify-content:space-between;align-items:center;}
 /* стрелка и «рамка» больше не нужны */
@@ -878,7 +900,7 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
   </label>
 
   <div class="dlg-actions">
-    <button class="btn-dark dlg-ok" disabled>Да, закрыть</button>
+    <button class="btn-dark-new dlg-ok" disabled>Да, закрыть</button>
     <button class="btn dlg-cancel">Отмена</button>
   </div>
 </dialog>
@@ -1282,7 +1304,7 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
             <label>Резервная сумма (₽)</label>
             <div class="range-wrap">
               <span class="range-values" id="reserveVal">5000</span>
-              <input type="range" id="reserve" min="0" max="10000" value="5000" step="500">
+              <input type="range" id="reserve" min="0" max="10000" value="5000" step="200">
             </div>
           </div>
           <!-- freeze -->
@@ -1303,7 +1325,7 @@ aside.right{padding:40px 40px 100px 0;display:flex;flex-direction:column;gap:36p
       </section>
       <!-- === Шаблон «Smart-вклад» =========================== -->
       <template id="tpl-smart">
-        <div class="card smart">
+        <div class="card full smart">
           <p class="c-title">Smart-вклад</p>
       
           <!-- текущая сумма -->
@@ -1461,7 +1483,7 @@ form.addEventListener('submit', e=>{
   /* ----- данные формы ----- */
   const monthly = +$('#monthly').value || 0;
   const term    = +$('#term').value    || 0;
-  const sum     = monthly * term;
+  const sum     = monthly;
   const today   = new Date();
 
   /* ----- создаём DOM-узел ----- */
@@ -1477,7 +1499,7 @@ form.addEventListener('submit', e=>{
     sum    : sum.toLocaleString('ru-RU') + ' ₽',
     income : (sum + income).toLocaleString('ru-RU') + ' ₽',
     incomeDelta : '(+' + incomeDelta.toLocaleString('ru-RU') + ' ₽)',
-    count  : '4',
+    count  : '1',
     max    : term + ' мес',
     end    : addDays(today, term*30),
     next   : addDays(today, 30),
