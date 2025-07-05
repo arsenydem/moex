@@ -9,19 +9,15 @@
 </head>
 <body>
 
-<!-- === Модалка-алерт после оформления ============================= -->
 <dialog id="dlg-alert" class="dlg dlg-alert">
   <p>Параметры отправлены! Мы подобрали для вас Smart-вклад.</p>
   <button class="btn-dark dlg-close" type="button">ОК</button>
 </dialog>
-<!-- === Модалка с подробной инфой по вкладу ======================== -->
 <dialog id="dlg-info" class="dlg dlg-info">
   <button class="dlg-x" aria-label="Закрыть">×</button>
 
-<!-- 0. Банк -->
 <p class="bank-name" data-field="bank"></p>
 
-<!-- 1. Верхняя строка: сумма + доход -->
 <section class="headline">
   <div class="head-col">
     <small>Текущая сумма</small>
@@ -35,7 +31,6 @@
   
 </section>
 
-<!-- 2. 2×2 метрики -->
 <section class="metrics-grid">
   <div class="metric">
     <small>Текущих вкладов</small><span class="val" data-field="count"></span>
@@ -51,7 +46,6 @@
   </div>
 </section>
 
-<!-- 3. Цели / ачивки -->
 <section class="tg-achv">
   <div class="tg-col">
     <h3>Цели</h3>
@@ -65,14 +59,12 @@
   </div>
 </section>
 
-<!-- 4. Две кнопки -->
 <footer class="dual-actions">
   <button class="btn-grey close-deposit" type="button">Закрыть вклад</button>
   <button class="btn-dark" type="button">Пополнить вклад</button>
 </footer>
 
 </dialog>    
-<!-- == Диалог подтверждения закрытия =================== -->
 <dialog id="dlg-close" class="dlg">
   <p>Вы уверены, что хотите закрыть вклад?<br>
      Деньги вернутся на кошелек, проценты обнулятся.</p>
@@ -91,15 +83,12 @@
 
 <div class="wrapper">
 
-  <!-- HEADER -->
   <header>
     <div class="logo-ph"><a href="#" title="Финуслуги - Личный кабинет" data-qa="layout-header-logo"><img src="https://assets.finuslugi.ru/mp-assets/images/common/logo/logo-finuslugi-lk.svg" alt="logo"></a></div>
     <div class="greeting">Привет! 👋</div>
 
-    <!-- badge -->
     <div class="badge"><span class="sprout"><img src="https://assets.finuslugi.ru/mp-assets/images/checklist/simple-level.png" alt="Начальный уровень" class="m-layout-header-level-icon"></span>Начальный уровень</div>
 
-    <!-- icons -->
     <div class="user-box">
     <span class="shapka-icons">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -115,7 +104,6 @@
     </div>
   </header>
 
-  <!-- SIDEBAR -->
   <aside class="left">
     <nav class="nav">
       <div class="nav-item active"><span class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path stroke="currentColor" stroke-linejoin="round" stroke-width="1.5" d="M1.75 18.24v-7.5h8V5.75h12.5v12.49H1.75Z"></path></svg></span>Мои продукты</div>
@@ -126,10 +114,8 @@
     </nav>
   </aside>
 
-  <!-- MAIN -->
   <main>
 
-    <!-- STORIES -->
     <section>
         <div class="stories">
           <div class="story"><div class="ring"><img class="storyes" width="84px" src="https://assets.finuslugi.ru/mp-content/stories/image.png" alt="" data-qa="story-item-image"></div><p>Обновление<br>iOS</p></div>
@@ -141,16 +127,13 @@
         </div>
       </section>
   
-      <!-- PRODUCTS -->
       <section>
         <h2>Мои продукты</h2>
       
         <div class="products">
-          <!-- Потратить бонусы -->
           <div class="card arrow">
             <div class="card-head">
               <div>Потратить бонусы<br><small>Финков</small></div>
-              <!-- ваша SVG-стрелка -->
               <span class="icon-arrow" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z" fill="currentColor"></path></svg></span>
             </div>
       
@@ -158,8 +141,7 @@
               <div class="amount">200&nbsp;🪙</div>
             </div>
           </div>
-      
-          <!-- Подключите Госуслуги -->
+
           <div class="card arrow">
             <div class="card-head">
               <div>Подключите Госуслуги<br><small>И получите бонус</small></div>
@@ -167,11 +149,10 @@
             </div>
       
             <div class="card-foot">
-              <div class="amount"></div>  <!-- placeholder, чтобы «слева было что-то» -->
+              <div class="amount"></div>  
             </div>
           </div>
       
-          <!-- Все активы -->
           <div class="card full arrow">
             <div class="card-head">
               <div>Все активы</div>
@@ -183,7 +164,6 @@
             </div>
           </div>
       
-          <!-- Баланс Кошелька -->
           <div class="card">
             <div class="card-head">
               <div>Баланс Кошелька</div>
@@ -199,21 +179,17 @@
             </div>
           </div>
       
-          <!-- Бонусный счёт -->
           <div class="card bonus">
             <div class="card-head">
               <div>Бонусный счёт<br><small>Получите&nbsp;19&nbsp;% на остаток</small></div>
-              <!-- здесь не стрелка, а ваша «спец-SVG» -->
               <span class="icon-bonus" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm0-18a8 8 0 1 1 0 16 8 8 0 0 1 0-16Z"></path><path fill="currentColor" d="M11.62 17.915a1 1 0 0 0 .76 0 1 1 0 0 0 .33-.21c.088-.097.16-.209.21-.33a.84.84 0 0 0 .08-.38 1 1 0 0 0-.29-.71 1.152 1.152 0 0 0-.33-.21 1 1 0 0 0-1.38.92c.004.265.107.518.29.71a.999.999 0 0 0 .33.21Z"></path><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M8 9.584C8 7.47 9.935 6 12 6s4 1.47 4 3.584c0 1.632-1.222 2.45-1.981 2.89h-.002c-.74.43-1.017.745-1.017 1.203V14a1 1 0 1 1-2 0v-.323c0-1.653 1.237-2.482 2.015-2.933.722-.42.985-.723.985-1.16C14 8.844 13.25 8 12 8s-2 .844-2 1.584a1 1 0 0 1-2 0Z"></path></svg></span>
             </div>
       
             <div class="card-foot">
-              <!-- слева можно поставить «—» или процент; оставил пусто -->
               <button class="btn-grey">Активировать</button>
             </div>
           </div>
       
-          <!-- Баннер не трогаем -->
           <div class="banner">
             <div><strong>Бонус до 1000&nbsp;₽ на ОСАГО!</strong><br><small>При покупке полиса с промокодом</small></div>
             <div class="banner-img">
@@ -226,7 +202,6 @@
       </section>
       
   
-      <!-- SAVINGS -->
       <section>
         <div class="savings-head"><h2 style="margin:0">Сбережения</h2><a href="#">Посмотреть ›</a></div>
         <div class="savings-list">
@@ -238,10 +213,8 @@
   
     </main>
   
-     <!-- RIGHT COLUMN -->
   <aside class="right">
 
-    <!-- .is-open — ставим, если хотим открыть карточку по умолчанию -->
     <div class="task-panel is-open" id="tasks">
         <div class="tp-header">
         <div class="tp-icon"><img src="https://assets.finuslugi.ru/mp-assets/images/checklist/simple-level.png" alt="Начальный уровень" class="m-layout-header-level-icon"></div>
@@ -250,8 +223,6 @@
             <strong>Задания от Финуслуг</strong>
             <small>Выполняйте задания и покупайте облигации</small>
         </div>
-    
-        <!-- Стрелку оставляем ради семантики, но кликаем по всей шапке -->
         <button class="tp-toggle" aria-label="Свернуть / развернуть">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="hfnsknk" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z"></path></svg>
         </button>
@@ -263,7 +234,6 @@
         <span class="tp-step">2</span>
         </div>
     
-        <!-- Тело, которое будем прятать -->
         <div class="tp-body">
         <div class="tp-item"><span>Привязать Госуслуги</span><span class="tp-reward">+500</span></div>
         <div class="tp-item"><span>Подтвердить email</span><span class="tp-reward">+100</span></div>
@@ -273,7 +243,6 @@
         </div>
         </div>
     </div>
-      <!-- CREDIT RATING -->
       <div class="panel" id="creditPanel">
         <h3 class="shapka-card">
           Кредитный рейтинг
@@ -283,7 +252,6 @@
           </span>
         </h3>
       
-        <!-- то, что должно прятаться -->
         <div class="panel-body">
             <svg width="222" height="111" viewBox="0 0 222 111" fill="none" xmlns="http://www.w3.org/2000/svg" class="Yj0qQ8byq17iKdBsXIPFFA==" data-qa="credit-rating-ranges-img"><path fill-rule="evenodd" clip-rule="evenodd" d="M208 111C208 57.4284 164.572 14 111 14C57.4284 14 14 57.4284 14 111H22C22 61.8467 61.8467 22 111 22C160.153 22 200 61.8467 200 111H208Z" fill="#DBDBDB"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M198 111C198 62.9512 159.049 24 111 24C62.9512 24 24 62.9512 24 111H26C26 64.0558 64.0558 26 111 26C157.944 26 196 64.0558 196 111H198Z" fill="#C4C4C4"></path><path data-regular="bad" d="M14 111L21.9847 111C21.9886 88.228 30.6777 65.4571 48.0522 48.0826L42.3954 42.4258C24.8508 59.9782 14 84.2219 14 111Z" fill="#FF0508"></path><path data-regular="fair" d="M42.4106 42.4106L48.0567 48.0567C64.1617 31.9571 86.4073 21.9999 110.979 21.9999V14C86.1612 14.0055 61.3456 23.4757 42.4106 42.4106Z" fill="#FF9045"></path><path data-regular="good" d="M111 14L111 21.9847C133.772 21.9886 156.543 30.6777 173.917 48.0522L179.574 42.3954C162.022 24.8508 137.778 14 111 14Z" fill="#FFE16C"></path><path data-regular="excellent" d="M179.589 42.4106L173.943 48.0567C190.043 64.1617 200 86.4073 200 110.978H208C207.995 86.1612 198.524 61.3456 179.589 42.4106Z" fill="#6EC959"></path><path data-expanded="bad" d="M21.9847 111H3.99991C3.99991 81.4605 15.97 54.7167 35.3243 35.3547L48.0522 48.0826C30.6777 65.4571 21.9886 88.228 21.9847 111Z" fill="#FF0508"></path>
                 <path data-expanded="fair" d="M48.0567 48.0567L35.3395 35.3395C56.2271 14.4519 83.602 4.00534 110.978 3.99989V21.9999C86.4073 21.9999 64.1617 31.9571 48.0567 48.0567Z" fill="#FF9045"></path>
@@ -294,7 +262,6 @@
             </svg>
         </div>
       </div>
-      <!-- INVEST RATING -->
     <div class="panel" id="creditPanel">
         <h3 class="shapka-card">
             Инвестиционный рейтинг
@@ -304,7 +271,6 @@
           </span>
         </h3>
       
-        <!-- то, что должно прятаться -->
         <div class="panel-body">
             <svg width="222" height="111" viewBox="0 0 222 111" fill="none" xmlns="http://www.w3.org/2000/svg" class="_4PiqhYiUmvG63I7w1b0h" data-qa="invest-rating-ranges-img"><path fill-rule="evenodd" clip-rule="evenodd" d="M208 111C208 57.4284 164.572 14 111 14C57.4284 14 14 57.4284 14 111H22C22 61.8467 61.8467 22 111 22C160.153 22 200 61.8467 200 111H208Z" fill="#DBDBDB"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M198 111C198 62.9512 159.049 24 111 24C62.9512 24 24 62.9512 24 111H26C26 64.0558 64.0558 26 111 26C157.944 26 196 64.0558 196 111H198Z" fill="#C2C7F7"></path><path data-regular="novice" d="M14 111L21.9847 111C21.9886 88.228 30.6777 65.4571 48.0522 48.0826L42.3954 42.4258C24.8508 59.9782 14 84.2219 14 111Z" fill="#E1E3FB"></path><path data-regular="standard" d="M42.4106 42.4106L48.0567 48.0567C64.1617 31.9571 86.4073 21.9999 110.979 21.9999V14C86.1612 14.0055 61.3456 23.4757 42.4106 42.4106Z" fill="#C2C7F7"></path><path data-regular="advanced" d="M111 14L111 21.9847C133.772 21.9886 156.543 30.6777 173.917 48.0522L179.574 42.3954C162.022 24.8508 137.778 14 111 14Z" fill="#A4A2FF"></path><path data-regular="experienced" d="M179.589 42.4106L173.943 48.0567C190.043 64.1617 200 86.4073 200 110.978H208C207.995 86.1612 198.524 61.3456 179.589 42.4106Z" fill="#6A80EF"></path><path data-expanded="novice" d="M21.9847 111H3.99991C3.99991 81.4605 15.97 54.7167 35.3243 35.3547L48.0522 48.0826C30.6777 65.4571 21.9886 88.228 21.9847 111Z" fill="#E1E3FB"></path>
                 <path data-expanded="standard" d="M48.0567 48.0567L35.3395 35.3395C56.2271 14.4519 83.602 4.00534 110.978 3.99989V21.9999C86.4073 21.9999 64.1617 31.9571 48.0567 48.0567Z" fill="#C2C7F7"></path>
@@ -314,7 +280,6 @@
             </svg>
         </div>
       </div>
-      <!-- OSAGO -->
       <div class="panel">
         <h3 style="margin:0">Добавьте полис ОСАГО</h3>
         <details class="osago-drop">
@@ -327,43 +292,41 @@
   
     </aside>
   
-    <!-- FOOTER -->
     <footer class="footer1">
         <div class="foot-grid">
       
-          <!-- 1. Кнопка-ссылка на сайт Финуслуг + иконка -->
           <div class="foot-col">
             <a href="https://finuslugi.ru/" class="foot-site">
-              <span class="site-ico"><img src="https://assets.finuslugi.ru/mp-assets/images/footer/redesigned-footer-logo.svg"></span>  <!-- ← сюда вставишь <img> -->
+              <span class="site-ico"><img src="https://assets.finuslugi.ru/mp-assets/images/footer/redesigned-footer-logo.svg"></span> 
               Перейти на сайт Финуслуг
             </a>
           </div>
       
-          <!-- 2. Телефоны -->
+
           <div class="foot-col">
             <strong>Позвонить:</strong>
             <a href="tel:88005053232">8 800 505-32-32</a>
             <a href="tel:+74951453232">+7 495 145-32-32</a>
           </div>
       
-          <!-- 3. Почта -->
+
           <div class="foot-col">
             <strong>Написать:</strong>
             <a href="mailto:service@finuslugi.ru">service@finuslugi.ru</a>
           </div>
       
-          <!-- 4. Адрес -->
+
           <div class="foot-col">
             <strong>Адрес:</strong>
             <a target="_blank">Большой Кисловский пер., 13,<br>Москва</a>
           </div>
       
-          <!-- 5. Соцсети + иконки-кнопки -->
+
           <div class="foot-col">
             <strong>Социальные сети:</strong>
             <div class="social">
-              <span class="soc-ico"><img src="https://assets.finuslugi.ru/mp-assets/images/sn/logo-vk-icon-redesigned.svg" alt="Официальная группа Вконтакте Финуслуг" loading="lazy"></span>  <!-- VK -->
-              <span class="soc-ico"><img src="https://assets.finuslugi.ru/mp-assets/images/sn/logo-telegram-icon-redesigned.svg" alt="Официальный телеграм-канал Финуслуг" loading="lazy"></span>  <!-- TG -->
+              <span class="soc-ico"><img src="https://assets.finuslugi.ru/mp-assets/images/sn/logo-vk-icon-redesigned.svg" alt="Официальная группа Вконтакте Финуслуг" loading="lazy"></span> 
+              <span class="soc-ico"><img src="https://assets.finuslugi.ru/mp-assets/images/sn/logo-telegram-icon-redesigned.svg" alt="Официальный телеграм-канал Финуслуг" loading="lazy"></span>  
             </div>
           </div>
       
@@ -376,12 +339,10 @@
       
   
   </div>
-  <!-- ========== MODAL ========== -->
   <div class="modal-overlay" id="smartModal">
     <div class="modal" role="dialog" aria-modal="true">
       <button class="close-btn" aria-label="Закрыть" id="closeSmart">×</button>
   
-      <!-- ===== ШАГ 1: КРАТКАЯ ИНФА ================================ -->
       <section class="step" id="step-info">
         <h2>Привет!</h2>
         <p>Боишься открывать вклад? Не знаешь, какой банк лучше выбрать?<br>
@@ -401,7 +362,6 @@
         </div>
       </section>
   
-      <!-- ===== ШАГ 2: РАСШИРЕННАЯ ИНФА ============================ -->
       <section class="step" id="step-details" hidden>
         <p><strong>«SmartВклад» — ваш умный способ сохранить и приумножить сбережения.</strong></p>
         <p>Мы предлагаем пользователям простое и безопасное решение для регулярного
@@ -414,12 +374,10 @@
         <button class="btn btn-light" id="backInfo1">← Назад</button>
       </section>
   
-      <!-- ===== ШАГ 3: ОПРОС ======================================= -->
       <section class="step step-survey" id="step-survey" hidden>
         <h3>Быстрый опрос</h3>
       
         <form id="surveyForm">
-          <!-- Q1 -->
           <div class="survey-q">
             <label for="amountSel">Сколько готовы откладывать ежемесячно?</label>
             <select id="amountSel" name="amount" required>
@@ -431,7 +389,6 @@
             </select>
           </div>
       
-          <!-- Q2 -->
           <div class="survey-q">
             <label for="horizonSel">Горизонт инвестирования</label>
             <select id="horizonSel" name="horizon" required>
@@ -443,7 +400,6 @@
             </select>
           </div>
       
-          <!-- Q3 -->
           <fieldset class="survey-q">
             <legend>Что для вас важнее?</legend>
             <div class="radio-wrap">
@@ -461,7 +417,6 @@
         </form>
       </section>      
   
-      <!-- ===== ШАГ 4: ГОТОВАЯ ФОРМА =============================== -->
       <section class="step" id="step-form" hidden>
         <h2 id="modalTitle">Выберите вклад с эксклюзивной ставкой</h2>
         <p>Собрали топ-варианты для вашего первого депозита — со ставками выше, чем в офисе банка.</p>
@@ -470,7 +425,6 @@
             <label for="monthly">Ежемесячная сумма</label>
             <input type="number" id="monthly" placeholder="Введите сумму" min="0" step="1000">
           </div>
-          <!-- срок -->
           <div class="form-group">
             <label>Максимальный срок вклада (мес)</label>
             <div class="range-wrap">
@@ -479,7 +433,6 @@
             </div>
           </div>
           <h4 style="margin:32px 0 18px;font-size:17px">Дополнительно</h4>
-          <!-- резерв -->
           <div class="form-group">
             <label>Резервная сумма (₽)</label>
             <div class="range-wrap">
@@ -487,12 +440,10 @@
               <input type="range" id="reserve" min="0" max="10000" value="5000" step="200">
             </div>
           </div>
-          <!-- freeze -->
           <div class="form-group">
             <label for="freeze">Период без реинвестирования (дней)</label>
             <input type="number" id="freeze" placeholder="Введите кол-во дней" min="0">
           </div>
-          <!-- ban -->
           <div class="form-group">
             <label for="ban">Нежелательные банки</label>
             <input type="text" id="ban" placeholder="Мы не будем открывать вклад в них">
@@ -508,10 +459,8 @@
         <div class="card full smart">
           <p class="c-title">Smart-вклад</p>
       
-          <!-- текущая сумма -->
           <p class="c-balance" data-el="sum">0 ₽</p>
-      
-          <!-- две мини-плашки -->
+
           <div class="c-meta">
             <div><small>Доход</small><span data-el="income">0 ₽</span></div>
             <div><small>Вкладов</small><span data-el="count">0</span></div>
