@@ -1502,3 +1502,108 @@ aside.right{
   user-select:none;
   border:2px solid #fff;
 }
+
+
+
+
+/* Контейнер селекта */
+.custom-select {
+  position: relative;
+  width: 100%;
+  max-width: 360px; /* при необходимости меняйте */
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Кнопка, показывающая выбранное значение */
+.custom-select__button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: none;
+  user-select: none;
+}
+
+/* Стили плейсхолдера */
+.custom-select__button .placeholder {
+  color: #8a8a8a;
+}
+
+/* Стрелка */
+.custom-select__arrow {
+  width: 12px;
+  height: 12px;
+  transform: rotate(0deg);
+  transition: transform .18s ease;
+  pointer-events: none;
+  display:inline-block;
+}
+.custom-select.open .custom-select__arrow {
+  transform: rotate(180deg);
+}
+
+/* Ваши стили списка (взято и расширено от .ms-list) */
+.ms-list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-top: 8px;
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  background: #fff;
+  padding: 6px 0;
+  z-index: 999;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  outline: none;
+}
+
+/* Пункт */
+.ms-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  list-style: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Выбранный / ховер */
+.ms-item[aria-selected="true"] { background:#f0e7ff; }
+.ms-item:hover { background:#f7f7f7; }
+
+/* Для фокусируемого элемента при навигации клавиатурой */
+.ms-item.focused {
+  outline: 2px solid rgba(94, 60, 255, 0.18);
+  background: #f7f3ff;
+}
+
+/* Скрываем оригинальный select */
+.custom-select--native-hidden {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Небольшая адаптация для мобильных: список становится статичным */
+@media (max-width: 480px) {
+  .ms-list { position: fixed; left: 12px; right: 12px; top: 20vh; max-height: 60vh; }
+}
+
+/* Для меток и отступов */
+.survey-q { margin-bottom: 16px; }
+.survey-q label { display:block; margin-bottom:8px; font-weight:600; }
