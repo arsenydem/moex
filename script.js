@@ -59,6 +59,236 @@ function sync(range, out, suff = ''){
 sync($('#term'),    $('#termVal'));
 sync($('#reserve'), $('#reserveVal'));
 
+
+(function() {
+  const selects = document.querySelectorAll('select');
+  const svgArrow = `<svg viewBox="0 0 24 24" class="custom-select__arrow" aria-hidden="true">
+    <path d="M7 10l5 5 5-5z" fill="currentColor"/>
+  </svg>`;
+
+  selects.forEach(original => createCustomSelect(original));
+
+  function createCustomSelect(original) {
+    // wrapper
+    const wrapper = document.createElement('div');
+    wrapper.className = 'custom-select';
+    wrapper.tabIndex = -1;
+
+    // hide native select but keep in DOM (form submission)
+    original.classList.add('custom-select--native-hidden');
+
+    // button that shows current value / placeholder
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'custom-select__button';
+    btn.setAttribute('aria-haspopup', 'listbox');
+    btn.setAttribute('aria-expanded', 'false');
+
+    const displaySpan = document.createElement('span');
+    displaySpan.className = 'custom-select__value';
+
+    // initial text
+    const initial = original.options[original.selectedIndex] && original.options[original.selectedIndex].text;
+    displaySpan.textContent = initial && original.value !== '' ? initial : (original.querySelector('option[disabled][selected]')?.textContent || 'Выберите…');
+    if (original.value === '' || original.selectedIndex === -1) displaySpan.classList.add('placeholder');
+
+    btn.appendChild(displaySpan);
+    btn.insertAdjacentHTML('beforeend', svgArrow);
+
+    // build list
+    const list = document.createElement('ul');
+    list.className = 'ms-list';
+    list.setAttribute('role', 'listbox');
+    list.setAttribute('tabindex', '-1');
+    list.style.display = 'none';
+
+    // create items from options
+    const items = [];
+    Array.from(original.options).forEach((opt, idx) => {
+      const li = document.createElement('li');
+      li.className = 'ms-item';
+      li.setAttribute('role', 'option');
+      li.dataset.value = opt.value;
+      li.dataset.index = idx;
+      li.textContent = opt.textContent;
+      if (opt.disabled) {
+        li.setAttribute('aria-disabled', 'true');
+        li.style.opacity = 0.6;
+      }
+      if (original.value === opt.value && !opt.disabled) {
+        li.setAttribute('aria-selected', 'true');
+      } else {
+        li.setAttribute('aria-selected', 'false');
+      }
+      list.appendChild(li);
+      items.push(li);
+    });
+
+    wrapper.appendChild(btn);
+    wrapper.appendChild(list);
+    original.parentNode.insertBefore(wrapper, original.nextSibling);
+
+    // state
+    let open = false;
+    let focusedIndex = -1;
+
+    // helpers
+    function openList() {
+      if (open) return;
+      wrapper.classList.add('open');
+      list.style.display = '';
+      btn.setAttribute('aria-expanded', 'true');
+      open = true;
+      // set focus on selected item or first enabled
+      const sel = items.findIndex(i => i.getAttribute('aria-selected') === 'true' && i.getAttribute('aria-disabled') !== 'true');
+      focusedIndex = sel >= 0 ? sel : items.findIndex(i => i.getAttribute('aria-disabled') !== 'true');
+      focusItem(focusedIndex);
+      // prevent page scroll when using arrows
+      list.focus();
+    }
+
+    function closeList() {
+      if (!open) return;
+      wrapper.classList.remove('open');
+      list.style.display = 'none';
+      btn.setAttribute('aria-expanded', 'false');
+      removeFocused();
+      open = false;
+      focusedIndex = -1;
+    }
+
+    function selectIndex(idx) {
+      const item = items[idx];
+      if (!item || item.getAttribute('aria-disabled') === 'true') return;
+      // update original select
+      original.value = item.dataset.value;
+      // update display
+      displaySpan.textContent = item.textContent;
+      displaySpan.classList.remove('placeholder');
+      // set aria-selected
+      items.forEach(i => i.setAttribute('aria-selected', 'false'));
+      item.setAttribute('aria-selected', 'true');
+
+      // trigger change event on original select (in case есть слушатели)
+      const ev = new Event('change', { bubbles: true });
+      original.dispatchEvent(ev);
+
+      closeList();
+      btn.focus();
+    }
+
+    function focusItem(idx) {
+      removeFocused();
+      if (idx < 0 || idx >= items.length) return;
+      focusedIndex = idx;
+      const it = items[idx];
+      it.classList.add('focused');
+      it.scrollIntoView({ block: 'nearest' });
+      it.focus?.();
+    }
+
+    function removeFocused() {
+      items.forEach(i => i.classList.remove('focused'));
+    }
+
+    // click handlers
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      open ? closeList() : openList();
+    });
+
+    items.forEach((it, idx) => {
+      it.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (it.getAttribute('aria-disabled') === 'true') return;
+        selectIndex(idx);
+      });
+      // allow keyboard focus per item
+      it.addEventListener('mouseenter', () => { focusItem(idx); });
+    });
+
+    // keyboard handling on wrapper
+    wrapper.addEventListener('keydown', (e) => {
+      const key = e.key;
+      if (!open) {
+        if (key === 'ArrowDown' || key === 'ArrowUp' || key === ' ') {
+          e.preventDefault();
+          openList();
+        }
+        return;
+      }
+
+      if (key === 'ArrowDown') {
+        e.preventDefault();
+        // next enabled
+        let i = focusedIndex;
+        do { i = (i + 1) % items.length; } while (items[i].getAttribute('aria-disabled') === 'true' && i !== focusedIndex);
+        focusItem(i);
+      } else if (key === 'ArrowUp') {
+        e.preventDefault();
+        let i = focusedIndex;
+        do { i = (i - 1 + items.length) % items.length; } while (items[i].getAttribute('aria-disabled') === 'true' && i !== focusedIndex);
+        focusItem(i);
+      } else if (key === 'Enter' || key === ' ') {
+        e.preventDefault();
+        selectIndex(focusedIndex);
+      } else if (key === 'Escape') {
+        e.preventDefault();
+        closeList();
+        btn.focus();
+      } else if (key === 'Home') {
+        e.preventDefault();
+        const i = items.findIndex(it => it.getAttribute('aria-disabled') !== 'true');
+        focusItem(i);
+      } else if (key === 'End') {
+        e.preventDefault();
+        let i = items.length - 1;
+        while (i >= 0 && items[i].getAttribute('aria-disabled') === 'true') i--;
+        focusItem(i);
+      } else if (key.length === 1 && /\S/.test(key)) {
+        // type to jump (simple)
+        const ch = key.toLowerCase();
+        const start = (focusedIndex + 1) % items.length;
+        let i = start;
+        do {
+          if (items[i].textContent.trim().toLowerCase().startsWith(ch) && items[i].getAttribute('aria-disabled') !== 'true') {
+            focusItem(i);
+            break;
+          }
+          i = (i + 1) % items.length;
+        } while (i !== start);
+      }
+    });
+
+    // click outside closes
+    document.addEventListener('click', (e) => {
+      if (!wrapper.contains(e.target)) closeList();
+    });
+
+    // keep original select in sync if changed programmatically
+    original.addEventListener('change', () => {
+      const val = original.value;
+      const idx = Array.from(original.options).findIndex(o => o.value === val);
+      if (idx >= 0) {
+        displaySpan.textContent = original.options[idx].textContent;
+        displaySpan.classList.toggle('placeholder', original.value === '');
+        items.forEach(i => i.setAttribute('aria-selected', 'false'));
+        if (items[idx]) items[idx].setAttribute('aria-selected', 'true');
+      }
+    });
+
+    // close on form submit? (optional)
+    const parentForm = original.closest('form');
+    if (parentForm) {
+      parentForm.addEventListener('submit', () => {
+        // nothing special — значение в оригинальном select уже установлено
+        closeList();
+      });
+    }
+  }
+})();
+
+
 $('#surveyForm').addEventListener('submit', e=>{
   e.preventDefault();
   const f   = e.target;
@@ -547,16 +777,40 @@ document.addEventListener('click', () => {
       openList();
     });
 
+    let suppressOpen = false;
+
+    // pointerdown в capture: предотвращаем дефолт (фокус) и помечаем suppressOpen
+    chipsWrap.addEventListener('pointerdown', (e) => {
+      const removeEl = e.target.closest('.remove');
+      if (removeEl) {
+        // предотвращаем переход фокуса и другие стандартные эффекты
+        e.preventDefault();
+        // помечаем, что следующий focus/click на selection нужно игнорировать
+        suppressOpen = true;
+        // сбросим флаг в следующем макротаске (чтобы он не висел слишком долго)
+        setTimeout(() => { suppressOpen = false; }, 0);
+      }
+    }, { capture: true });
+
     // chips: remove by click
     chipsWrap.addEventListener('click', (e) => {
-      const chip = e.target.closest('.ms-chip');
+      const removeEl = e.target.closest('.remove');
+      if (!removeEl) return;
+      // предотвращаем попадание клика в родителя
+      e.stopPropagation();
+
+      const chip = removeEl.closest('.ms-chip');
       if (!chip) return;
-      if (e.target.classList.contains('remove')) {
-        const id = chip.getAttribute('data-id');
-        deselectById(id);
-      }
+      const id = chip.getAttribute('data-id');
+
+      // удаляем чип
+      deselectById(id);
+
+      // не делаем search.focus() — чтобы не открывать список
+      // если хочется фокусировать, можно это делать по явному действию пользователя (например, по клику в свободное место)
     });
 
+    
     // keyboard interactions
     search.addEventListener('keydown', (e) => {
       const items = Array.from(list.children);
@@ -594,19 +848,32 @@ document.addEventListener('click', () => {
       openList();
       focusedIndex = -1;
     });
-
-    // focus behavior: open list on focus
-    selection.addEventListener('focus', () => {
-      doFilter(search.value);
-      openList();
-    });
-
+    
     // click on selection opens search
-    selection.addEventListener('click', () => {
+    selection.addEventListener('click', (e) => {
+      if (suppressOpen) {
+        // сразу сбрасываем и ничего не делаем
+        suppressOpen = false;
+        return;
+      }
+      // если клик попал в чип — ничего не делаем (удаление обработано выше)
+      if (e.target.closest('.ms-chip') || e.target.closest('.remove')) return;
+
+      // обычное поведение: переводим фокус в инпут и открываем список
       search.focus();
       doFilter(search.value);
       openList();
     });
+
+
+    // focus behavior: open list on focus
+    selection.addEventListener('focus', (e) => {
+      if (suppressOpen) { suppressOpen = false; return; }
+      doFilter(search.value);
+      openList();
+    });
+
+    
 
     // click outside close
     document.addEventListener('click', (e) => {
