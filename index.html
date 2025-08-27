@@ -14,49 +14,54 @@
   <button class="btn-dark dlg-close" type="button">ОК</button>
 </dialog>
 <dialog id="dlg-info" class="dlg dlg-info">
-  <button class="dlg-x" aria-label="Закрыть">×</button>
+  <header class="dlg-header">
+    <p class="bank-name" data-field="bank"></p>
+    <button class="dlg-x" aria-label="Закрыть">×</button>
+  </header>
 
-<p class="bank-name" data-field="bank"></p>
+  <section class="headline">
+    <div class="head-col">
+      <small>Текущая сумма</small>
+      <p class="big" data-field="sum">105 000 ₽</p>
+    </div>
+    <div class="head-col">
+      <small>Ожидаемый доход</small>
+      <p class="big" data-field="income">125 000 ₽</p>
+      <span class="sub" data-field="incomeDelta">(+20 000 ₽)</span>
+    </div>
+    
+  </section>
 
-<section class="headline">
-  <div class="head-col">
-    <small>Текущая сумма</small>
-    <p class="big" data-field="sum">105 000 ₽</p>
-  </div>
-  <div class="head-col">
-    <small>Ожидаемый доход</small>
-    <p class="big" data-field="income">125 000 ₽</p>
-    <span class="sub" data-field="incomeDelta">(+20 000 ₽)</span>
-  </div>
-  
-</section>
+  <section class="metrics-grid">
+    <div class="metric">
+      <small>Текущих вкладов</small><span class="val" data-field="count"></span>
+    </div>
+    <div class="metric">
+      <small>Макс. срок</small><span class="val" data-field="max"></span>
+    </div>
+    <div class="metric">
+      <small>Ближайшее завершение</small><span class="val" data-field="end"></span>
+    </div>
+    <div class="metric">
+      <small>Следующее списание</small><span class="val" data-field="next"></span>
+    </div>
+  </section>
 
-<section class="metrics-grid">
-  <div class="metric">
-    <small>Текущих вкладов</small><span class="val" data-field="count"></span>
-  </div>
-  <div class="metric">
-    <small>Макс. срок</small><span class="val" data-field="max"></span>
-  </div>
-  <div class="metric">
-    <small>Ближайшее завершение</small><span class="val" data-field="end"></span>
-  </div>
-  <div class="metric">
-    <small>Следующее списание</small><span class="val" data-field="next"></span>
-  </div>
-</section>
-
-<section class="tg-achv">
-  <div class="tg-col">
-    <h3>Цели</h3>
-    <ul class="goal-list">
-      <li>Накопить 150 000 ₽ на машину</li>
-    </ul>    
-  </div>
-  <div class="tg-col">
-    <h3>Достижения</h3>
-    <ul class="achv-list" data-field="achv"></ul>
-  </div>
+  <section class="tg-achv">
+    <div class="tg-col">
+      <h3>Цели</h3>
+    
+      <ul class="goal-list" data-field="goals"></ul>
+    
+      <div class="goal-controls" style="margin-top:10px;">
+        <input type="text" id="goal-input" placeholder="Цель ..." aria-label="Новая цель" />
+        <button type="button" id="add-goal-btn" class="btn btn-light">Добавить</button>
+      </div>
+    </div>
+    <div class="tg-col">
+      <h3>Достижения</h3>
+      <ul class="achv-list" data-field="achv"></ul>
+    </div>
 </section>
 
 <footer class="dual-actions">
@@ -76,7 +81,7 @@
   </label>
 
   <div class="dlg-actions">
-    <button class="btn-dark-new dlg-ok" disabled>Да, закрыть</button>
+    <button class="btn btn-dark-new" disabled>Да, закрыть</button>
     <button class="btn dlg-cancel">Отмена</button>
   </div>
 </dialog>
@@ -133,7 +138,7 @@
         <div class="products">
           <div class="card arrow">
             <div class="card-head">
-              <div>Потратить бонусы<br><small>Финков</small></div>
+              <div>Потратить бонусы<br><small>Фиников</small></div>
               <span class="icon-arrow" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.466 19.551A1.478 1.478 0 0 1 7 18.481c0-.401.167-.786.466-1.07l5.667-5.449L7.466 6.59A1.479 1.479 0 0 1 7 5.52c0-.401.167-.786.466-1.07.148-.142.325-.255.52-.332a1.677 1.677 0 0 1 1.232 0c.195.077.372.19.52.332l6.788 6.435c.15.141.27.31.35.494a1.45 1.45 0 0 1 0 1.168c-.08.185-.2.353-.35.494L9.74 19.55a1.609 1.609 0 0 1-.521.332 1.678 1.678 0 0 1-1.232 0 1.609 1.609 0 0 1-.52-.332Z" fill="currentColor"></path></svg></span>
             </div>
       
@@ -340,9 +345,14 @@
   
   </div>
   <div class="modal-overlay" id="smartModal">
+    
     <div class="modal" role="dialog" aria-modal="true">
-      <button class="close-btn" aria-label="Закрыть" id="closeSmart">×</button>
-  
+      <header class="modal-header" role="banner">
+        <div class="modal-title-wrap">
+          <h2 class="modal-title" aria-live="polite"></h2>
+        </div>
+        <button class="close-btn" aria-label="Закрыть" id="closeSmart">×</button>
+      </header>
       <section class="step" id="step-info">
         <h2>Привет!</h2>
         <p>Боишься открывать вклад? Не знаешь, какой банк лучше выбрать?<br>
@@ -356,13 +366,14 @@
            экономит время, обеспечивает гибкость и высокую доходность.</p>
   
         <div class="actions">
-          <button class="btn btn-light"   id="toDetails">Подробнее</button>
-          <button class="btn btn-light"   id="toSurvey">Пройти опрос</button>
-          <button class="btn"             id="toForm">Перейти к оформлению</button>
+          <button class="btn btn-light" id="toDetails">Подробнее</button>
+          <button class="btn btn-light" id="toSurvey">Пройти опрос</button>
+          <button class="btn btn-red" id="toForm">Перейти к оформлению</button>
         </div>
       </section>
   
       <section class="step" id="step-details" hidden>
+        <h2>Подробная информация</h2>
         <p><strong>«SmartВклад» — ваш умный способ сохранить и приумножить сбережения.</strong></p>
         <p>Мы предлагаем пользователям простое и безопасное решение для регулярного
            перевода средств на оптимальные банковские вклады с максимальной доходностью.</p>
@@ -370,7 +381,10 @@
            • Каждый месяц мы автоматически списываем указанную вами сумму.<br>
            • Анализируем условия банков и выбираем наиболее привлекательные ставки.<br>
            • Средства распределены по нескольким банкам и застрахованы до 1,4 млн ₽.<br>
-           • Вы всегда видите отчёты о росте капитала.</p>
+           • Вы всегда видите отчёты о росте капитала.<br></p>
+        <p class="podrobno">
+          Можете ознакомиться с официальным <a href="https://docs.google.com/document/d/1xq-V3LoRJUb5eLb3991_vQpGKmPs69C7e1pncQyQDAk/edit?usp=sharing" target="_blank">документом</a>
+        </p>
         <button class="btn btn-light" id="backInfo1">← Назад</button>
       </section>
   
@@ -422,32 +436,64 @@
         <p>Собрали топ-варианты для вашего первого депозита — со ставками выше, чем в офисе банка.</p>
         <form id="depositForm">
           <div class="form-group">
-            <label for="monthly">Ежемесячная сумма</label>
+            <label for="monthly">Ежемесячная сумма
+              <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-monthly"
+                    data-tooltip="Сколько вы готовы откладывать каждый месяц. Влияет на итоговую сумму и ваш доход.">i</span>
+            </label>
             <input type="number" id="monthly" placeholder="Введите сумму" min="0" step="1000">
           </div>
+      
           <div class="form-group">
-            <label>Максимальный срок вклада (мес)</label>
+            <label>Максимальный срок вклада (мес)
+              <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-term"
+                    data-tooltip="Максимальное количество месяцев, на которое вы готовы открыть вклад. Чем больше срок — тем обычно выше ставка.">i</span>
+            </label>
             <div class="range-wrap">
               <span class="range-values" id="termVal">18</span>
               <input type="range" id="term" min="0" max="36" value="18">
             </div>
           </div>
+      
           <h4 style="margin:32px 0 18px;font-size:17px">Дополнительно</h4>
+      
           <div class="form-group">
-            <label>Резервная сумма (₽)</label>
+            <label>Резервная сумма (₽)
+              <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-reserve"
+                    data-tooltip="Сумма, которую вы сможете снять в любой момент.">i</span>
+            </label>
             <div class="range-wrap">
               <span class="range-values" id="reserveVal">5000</span>
               <input type="range" id="reserve" min="0" max="10000" value="5000" step="200">
             </div>
           </div>
+      
           <div class="form-group">
-            <label for="freeze">Период без реинвестирования (дней)</label>
+            <label for="freeze">Период без реинвестирования (дней)
+              <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-freeze"
+                    data-tooltip="Сколько дней процентные выплаты остаются 'выведенными' и не реинвестируются автоматически. Влияет на начисления и налоговую базу.">i</span>
+            </label>
             <input type="number" id="freeze" placeholder="Введите кол-во дней" min="0">
           </div>
-          <div class="form-group">
-            <label for="ban">Нежелательные банки</label>
-            <input type="text" id="ban" placeholder="Мы не будем открывать вклад в них">
-          </div>
+      
+<div class="form-group">
+  <label for="banSelect">Нежелательные банки
+    <span class="info-icon" role="button" tabindex="0"
+          data-tooltip="Выберите банки, в которых вы не хотите открывать вклад. Можно выбрать несколько.">i</span>
+  </label>
+
+  <div class="multi-select" id="banSelect" aria-haspopup="listbox">
+    <div class="ms-selection" tabindex="0" role="combobox" aria-expanded="false" aria-controls="banList">
+      <div class="ms-chips" aria-hidden="false"></div>
+      <input class="ms-search" type="text" placeholder="Поиск банка..." aria-label="Поиск банка" />
+    </div>
+
+    <ul class="ms-list" id="banList" role="listbox" aria-multiselectable="true" hidden></ul>
+  </div>
+
+  <input type="hidden" name="ban" id="ban-input" value="">
+</div>
+
+      
           <footer class="actions">
             <button class="btn" type="submit">Подобрать вклад</button>
             <button class="btn btn-light" id="backInfo3" type="button">← Назад</button>
