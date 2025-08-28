@@ -1598,3 +1598,7 @@ aside.right{
 /* Для меток и отступов */
 .survey-q { margin-bottom: 16px; }
 .survey-q label { display:block; margin-bottom:8px; font-weight:600; }
+
+.modal-title-wrap {
+  margin-right: 20px
+}
