@@ -330,55 +330,286 @@ const tplSmart = $('#tpl-smart');
 const products = $('.products');
 const banner   = $('.banner');
 
+// Окно подтверждения при открытии вклада
 const dlgAlert = $('#dlg-alert');
-dlgAlert.querySelector('.dlg-close')
-        .addEventListener('click', () => dlgAlert.close());
+const dlg = document.getElementById('dlg-alert'); 
+(() => {
+  // --- Получаем элемент (работает с $ (jQuery-подобным) или без него) ---
+  const raw = (typeof $ === 'function') ? $('#dlg-alert') : null;
+  const dlg = raw
+    ? (raw instanceof Element ? raw : raw[0])   // если $ вернул DOM-узел или jQuery-объект
+    : document.getElementById('dlg-alert');
+
+  if (!dlg) {
+    console.warn('Диалог #dlg-alert не найден');
+    return;
+  }
+
+  const checkbox = dlg.querySelector('#openAgree');
+  const btnConfirm = dlg.querySelector('#confirmOpen');
+  const btnCancel = dlg.querySelector('.dlg-cancel');
+
+  // Защита: если чего-то нет — лог и выход
+  if (!checkbox || !btnConfirm || !btnCancel) {
+    console.warn('В модалке отсутствуют необходимые элементы: checkbox / confirm / cancel');
+    return;
+  }
+
+  // --- Состояние фокуса для восстановления ---
+  let previousActive = null;
+
+  // --- Вспомогательные: открыть / закрыть модалку ---
+  function showDialog() {
+    previousActive = document.activeElement;
+    // если браузер поддерживает <dialog>
+    if (typeof dlg.showModal === 'function') {
+      try { dlg.showModal(); }
+      catch (e) { /* если уже открыт или ошибка — игнор */ }
+    } else {
+      dlg.removeAttribute('hidden');
+      dlg.setAttribute('aria-modal', 'true');
+    }
+    // фокус на чекбоксе (или на кнопке, если нужно)
+    checkbox.focus();
+    // синхронизируем кнопку (вдруг состояние осталось)
+    btnConfirm.disabled = !checkbox.checked;
+  }
+
+  function closeDialog(reason = 'cancel') {
+    if (typeof dlg.close === 'function') {
+      try { dlg.close(); } catch (e) {}
+    } else {
+      dlg.setAttribute('hidden', '');
+      dlg.removeAttribute('aria-modal');
+    }
+    // восстановим фокус
+    if (previousActive && typeof previousActive.focus === 'function') {
+      previousActive.focus();
+      previousActive = null;
+    }
+    // чистим чекбокс чтобы при следующем открытии было предсказуемо
+    checkbox.checked = false;
+    btnConfirm.disabled = true;
+  }
+
+  // --- Логика активации кнопки по чекбоксу ---
+  checkbox.addEventListener('change', () => {
+    btnConfirm.disabled = !checkbox.checked;
+  });
+
+  // --- Обработчики кнопок ---
+  btnConfirm.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (btnConfirm.disabled) return;
+    // высылаем событие, чтобы основной код сделал списание/открытие вклада
+    dlg.dispatchEvent(new CustomEvent('deposit:confirm', { detail: { timestamp: Date.now() } }));
+    closeDialog('confirm');
+  });
+
+  btnCancel.addEventListener('click', (e) => {
+    e.preventDefault();
+    dlg.dispatchEvent(new CustomEvent('deposit:cancel', { detail: { timestamp: Date.now() } }));
+    closeDialog('cancel');
+  });
+
+  // --- Обработка клавиш внутри модалки ---
+  dlg.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      dlg.dispatchEvent(new CustomEvent('deposit:cancel', { detail: { by: 'escape' } }));
+      closeDialog('cancel');
+    } else if (e.key === 'Enter') {
+      // если Enter и кнопка активна — подтвердить
+      // но если фокус в чекбоксе — стандартное поведение toggle оставим
+      const active = document.activeElement;
+      const inCheckbox = active === checkbox;
+      if (!btnConfirm.disabled && !inCheckbox) {
+        e.preventDefault();
+        dlg.dispatchEvent(new CustomEvent('deposit:confirm', { detail: { by: 'enter' } }));
+        closeDialog('confirm');
+      }
+    }
+  });
+
+  // --- Обработка клика по backdrop (опционально) ---
+  // если хотите закрывать при клике по затемнению — раскомментируйте:
+  /*
+  dlg.addEventListener('click', (e) => {
+    if (e.target === dlg) { // клик именно по фону
+      dlg.dispatchEvent(new CustomEvent('deposit:cancel', { detail: { by: 'backdrop' } }));
+      closeDialog('cancel');
+    }
+  });
+  */
+
+  // --- Обработчик события cancel (на native <dialog>) ---
+  dlg.addEventListener('cancel', (e) => {
+    // предотвращаем автоматическое закрытие, если нужно — или просто обрабатываем
+    // e.preventDefault();
+    dlg.dispatchEvent(new CustomEvent('deposit:cancel', { detail: { by: 'native-cancel' } }));
+    closeDialog('cancel');
+  });
+
+  // --- Публичный API: показываем модалку через dlg._openDeposit() ---
+  // Можно вызвать dlg._openDeposit() извне, чтобы открыть диалог.
+  dlg._openDeposit = showDialog;
+  dlg._closeDeposit = () => closeDialog('programmatic');
+
+  // --- Пример: подписка на подтверждение/отмену ---
+  // В основном коде используйте:
+  // dlg.addEventListener('deposit:confirm', e => { /* выполнить списание */ });
+  // dlg.addEventListener('deposit:cancel', e => { /* логика отмены */ });
+
+  // Автоматически синхронизируем состояние при инициализации
+  btnConfirm.disabled = !checkbox.checked;
+
+  // --- Если нужно: открываем автоматически (удалите/закомментируйте) ---
+  // showDialog();
+
+})();
+
+
 
 const dlgInfo  = $('#dlg-info');
+
+
+
 const dlgClose = $('#dlg-close');
 
 const agreeBox = $('#closeAgree');
+
 const btnYes   = dlgClose.querySelector('.btn-dark-new');
 const btnCancelClose = dlgClose.querySelector('.dlg-cancel');
 
 let pendingCard = null; 
 
-form.addEventListener('submit', e=>{
+// Утилита форматирования суммы
+function formatRub(n) {
+  return n.toLocaleString('ru-RU') + ' ₽';
+}
+
+// --- Обработчик отправки формы: создаём карточку, но не вставляем ---
+form.addEventListener('submit', e => {
   e.preventDefault();
 
-  const monthly = +$('#monthly').value || 0;
-  const term    = +$('#term').value    || 0;
+  const monthly = +document.getElementById('monthly').value || 0;
+  const term    = +document.getElementById('term').value    || 0;
   const sum     = monthly;
   const today   = new Date();
 
+  // собираем карточку (клонируем шаблон)
   const card = tplSmart.content.firstElementChild.cloneNode(true);
 
-  const income      = sum * 0.12;
+  const income = sum * 0.12; // ваша формула
 
   Object.assign(card.dataset, {
     bank   : 'Т-банк',
-    sum    : sum.toLocaleString('ru-RU') + ' ₽',
-    income : (sum + income).toLocaleString('ru-RU') + ' ₽',
-    incomeDelta : '(+' + income.toLocaleString('ru-RU') + ' ₽)',
+    sum    : formatRub(sum),
+    income : formatRub(sum + income),
+    incomeDelta : '(+' + formatRub(income).replace(' ₽','') + ' ₽)',
     count  : '1',
     max    : term + ' мес',
-    end    : addDays(today, term*30),
+    end    : addDays(today, term*30), // предполагается, что addDays определён
     next   : addDays(today, 30),
     goals  : 'Накопить 150 000 ₽ на машину',
     achv   : 'Самурай|Вин-стрик'
   });
 
   card.querySelector('[data-el="sum"]').textContent    = card.dataset.sum;
-  card.querySelector('[data-el="income"]').textContent = income.toLocaleString('ru-RU') + ' ₽';
+  card.querySelector('[data-el="income"]').textContent = (income).toLocaleString('ru-RU') + ' ₽';
   card.querySelector('[data-el="count"]').textContent  = card.dataset.count;
 
-  card.addEventListener('click', () => openInfo(card));
+  // не вешаем card.addEventListener('click', ...) пока не вставим в DOM —
+  // вешаем это при подтверждении.
 
-  products.insertBefore(card, banner);
+  // сохраняем карточку как pending (перезаписываем предыдущую, если была)
+  pendingCard = card;
 
-  smartModal.classList.remove('show');
-  dlgAlert.showModal();
+  // закрываем smart modal (если используется) и открываем окно подтверждения
+  if (smartModal && smartModal.classList) smartModal.classList.remove('show');
+
+  // поддержка двух вариантов открытия: если диалог имеет метод _openDeposit (наш ранее предложенный скрипт) — используем его,
+  // иначе native showModal, иначе убираем hidden.
+  if (dlg) {
+    if (typeof dlg._openDeposit === 'function') dlg._openDeposit();
+    else if (typeof dlg.showModal === 'function') dlg.showModal();
+    else dlg.removeAttribute('hidden');
+  } else {
+    console.warn('#dlg-alert не найден — карточка будет добавлена немедленно');
+    // fallback: вставляем сразу (но это странно — лучше иметь диалог)
+    products.insertBefore(card, banner);
+    // навешиваем обработчик безопасно — this будет ссылаться на элемент
+    card.addEventListener('click', function (e) {
+      openInfo(this); 
+    });
+    pendingCard = null;
+  }
 });
+
+// --- Подтверждение: вставляем pendingCard в DOM ---
+function confirmInsert() {
+  if (!pendingCard) return;
+
+  // вставляем в DOM
+  products.insertBefore(pendingCard, banner);
+
+  // вешаем обработчик так, чтобы openInfo получил именно элемент (this / e.currentTarget)
+  pendingCard.addEventListener('click', function (e) {
+    openInfo(e.currentTarget); // или openInfo(this)
+  });
+
+  // обнуляем переменную pendingCard (обработчик уже привязан к элементу)
+  pendingCard = null;
+
+  // Закрываем диалог, если он ещё открыт
+  if (dlg) {
+    if (typeof dlg._closeDeposit === 'function') dlg._closeDeposit();
+    else if (typeof dlg.close === 'function') {
+      try { dlg.close(); } catch (err) {}
+    } else dlg.setAttribute('hidden', '');
+  }
+}
+
+function cancelPending() {
+  pendingCard = null;
+  if (dlg) {
+    if (typeof dlg._closeDeposit === 'function') dlg._closeDeposit();
+    else if (typeof dlg.close === 'function') {
+      try { dlg.close(); } catch (err) {}
+    } else dlg.setAttribute('hidden', '');
+  }
+}
+
+// --- Слушаем события от модалки ---
+// 1) Кастомные события (если используется предыдущий скрипт модалки)
+if (dlg) {
+  dlg.addEventListener('deposit:confirm', confirmInsert);
+  dlg.addEventListener('deposit:cancel', cancelPending);
+
+  // 2) И на всякий случай — прямые клики на кнопки внутри диалога
+  const btnConfirm = dlg.querySelector('#confirmOpen');
+  const btnCancel  = dlg.querySelector('.dlg-cancel');
+
+  if (btnConfirm) btnConfirm.addEventListener('click', (e) => {
+    e.preventDefault();
+    // если кнопка была выключена — ничего не делаем
+    if (btnConfirm.disabled) return;
+    confirmInsert();
+  });
+
+  if (btnCancel) btnCancel.addEventListener('click', (e) => {
+    e.preventDefault();
+    cancelPending();
+  });
+
+  // 3) Если диалог закрывается нативно (например методом close или backdrop),
+  //    можно очистить pending, чтобы не оставить "висячую" карточку.
+  dlg.addEventListener('close', () => {
+    // если диалог закрылся без явного confirm — считаем это отменой
+    // (если confirm уже сработал, pendingCard = null)
+    if (pendingCard) pendingCard = null;
+  });
+}
 
 /* ---- Helpers: добавлять цель, рендерить список и инициализировать info-иконки ---- */
 
@@ -628,7 +859,7 @@ document.addEventListener('click', () => {
     
   
 
-// нежелательные банки (может удалить)
+// нежелательные банки 
 (function () {
   // Список банков (можно загрузить динамически с сервера)
   const BANKS = [
@@ -893,5 +1124,10 @@ document.addEventListener('click', () => {
   } else {
     initBanSelect();
   }
-})();  
+
+})(); 
+// окно предупреждения при открытии вклада
+  const chk = document.getElementById('openAgree');
+  const btn = document.getElementById('confirmOpen');
+  chk.addEventListener('change', () => btn.disabled = !chk.checked);
 }); 
