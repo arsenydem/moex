@@ -10,9 +10,19 @@
 <body>
 
 <dialog id="dlg-alert" class="dlg dlg-alert">
-  <p>Параметры отправлены! Мы подобрали для вас Smart-вклад.</p>
-  <button class="btn-dark dlg-close" type="button">ОК</button>
+    <p>Нажимая «Да, открыть», я подтверждаю, что ознакомлен(а) с тарифами и условиями вклада, порядком начисления и выплаты процентов, условиями досрочного расторжения, а также с текстом оферты и политикой обработки персональных данных. Я даю согласие на списание указанной суммы с моего кошелька для открытия вклада и на обработку моих данных в объёме, необходимом для исполнения договора.</p>
+  
+    <label class="close-disclaimer">
+      <input type="checkbox" id="openAgree">
+      Я подтверждаю, что прочитал(а) и согласен(на) с условиями, и даю необходимые согласия.
+    </label>
+  
+    <div class="dlg-actions">
+      <button class="btn btn-dark-new" id="confirmOpen" disabled>Да, открыть</button>
+      <button class="btn dlg-cancel">Отмена</button>
+    </div>
 </dialog>
+
 <dialog id="dlg-info" class="dlg dlg-info">
   <header class="dlg-header">
     <p class="bank-name" data-field="bank"></p>
@@ -85,6 +95,8 @@
     <button class="btn dlg-cancel">Отмена</button>
   </div>
 </dialog>
+
+
 
 <div class="wrapper">
 
@@ -436,9 +448,17 @@
         <p>Собрали топ-варианты для вашего первого депозита — со ставками выше, чем в офисе банка.</p>
         <form id="depositForm">
           <div class="form-group">
+            <label for="monthly">Сумма вклада
+              <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-monthly"
+                    data-tooltip="Первоначальная сумма, которую кладёт пользователь.">i</span>
+            </label>
+            <input type="number" id="monthly" placeholder="Введите сумму" min="0" step="1000">
+          </div>
+
+          <div class="form-group">
             <label for="monthly">Ежемесячная сумма
               <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-monthly"
-                    data-tooltip="Сколько вы готовы откладывать каждый месяц. Влияет на итоговую сумму и ваш доход.">i</span>
+                    data-tooltip="Сумма, которая будет списываться с вашего счёта со следующего месяца.">i</span>
             </label>
             <input type="number" id="monthly" placeholder="Введите сумму" min="0" step="1000">
           </div>
@@ -454,7 +474,7 @@
             </div>
           </div>
       
-          <h4 style="margin:32px 0 18px;font-size:17px">Дополнительно</h4>
+          <!-- <h4 style="margin:32px 0 18px;font-size:17px">Дополнительно</h4> -->
       
           <div class="form-group">
             <label>Резервная сумма (₽)
