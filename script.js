@@ -1637,6 +1637,7 @@ document.addEventListener('click', () => {
   }
 
   
+  
   // wait DOM
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => initBanSelect());
@@ -1650,3 +1651,4 @@ document.addEventListener('click', () => {
   const btn = document.getElementById('confirmOpen');
   chk.addEventListener('change', () => btn.disabled = !chk.checked);
 }); 
+
