@@ -546,28 +546,148 @@ form.addEventListener('submit', e => {
   }
 });
 
+// easing
+function easeInOutQuad(t) {
+  return t < 0.5 ? 2*t*t : -1 + (4 - 2*t)*t;
+}
+
+/**
+ * Анимированная прокрутка контейнера или окна до целевой позиции.
+ * target — число (пиксели scrollTop для контейнера или pageYOffset для окна)
+ * duration — миллисекунды
+ */
+function animateScrollTo(container, target, duration = 800) {
+  const isWindow = (container === window || container === document.body || container === document.documentElement);
+  const start = isWindow ? window.pageYOffset : container.scrollTop;
+  const change = target - start;
+  const startTime = performance.now();
+
+  return new Promise(resolve => {
+    function step(now) {
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / duration);
+      const eased = easeInOutQuad(t);
+      const current = start + change * eased;
+      if (isWindow) {
+        window.scrollTo(0, Math.round(current));
+      } else {
+        container.scrollTop = Math.round(current);
+      }
+      if (t < 1) requestAnimationFrame(step);
+      else resolve();
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+/* Удобная функция: центрирует элемент в контейнере/окне с вертикальным смещением.
+   offsetRatio — положительное число (доля высоты); 0 — центр, 0.15 — поднять на 15% выше центра.
+   duration — длительность анимации в ms.
+*/
+async function scrollElementToCenter(element, container = window, offsetRatio = 0.15, duration = 800) {
+  if (!element) return;
+  const elRect = element.getBoundingClientRect();
+
+  const isContainerWindow = (container === window || container === document.body || container === document.documentElement);
+
+  if (isContainerWindow) {
+    const viewportH = window.innerHeight;
+    const targetCenterY = viewportH * (0.5 - offsetRatio); // желаемая координата центра элемента относительно viewport
+    const targetScroll = window.pageYOffset + elRect.top - targetCenterY + (elRect.height / 2);
+    await animateScrollTo(window, targetScroll, duration);
+  } else {
+    // контейнер — прокручиваемый блок
+    const contRect = container.getBoundingClientRect();
+    const viewportH = container.clientHeight;
+    const targetCenterY = viewportH * (0.5 - offsetRatio);
+    const elTopRelative = elRect.top - contRect.top;
+    const targetScroll = container.scrollTop + elTopRelative - targetCenterY + (elRect.height / 2);
+    await animateScrollTo(container, targetScroll, duration);
+  }
+}
 // --- Подтверждение: вставляем pendingCard в DOM ---
 function confirmInsert() {
   if (!pendingCard) return;
 
-  // вставляем в DOM
-  products.insertBefore(pendingCard, banner);
+  // локальная ссылка, чтобы замыкания были безопасны
+  const cardEl = pendingCard;
 
-  // вешаем обработчик так, чтобы openInfo получил именно элемент (this / e.currentTarget)
-  pendingCard.addEventListener('click', function (e) {
-    openInfo(e.currentTarget); // или openInfo(this)
+  // вставляем в DOM
+  products.insertBefore(cardEl, banner);
+
+  // навешиваем корректный обработчик клика
+  cardEl.addEventListener('click', function (e) {
+    openInfo(e.currentTarget);
   });
 
-  // обнуляем переменную pendingCard (обработчик уже привязан к элементу)
+  // красивое появление
+  cardEl.classList.add('new-card-fade-in');
+
+  // определяем контейнер для прокрутки: если products — scrollable, используем его, иначе окно
+  const isScrollContainer = (products !== document.body && products !== document.documentElement && getComputedStyle(products).overflowY !== 'visible');
+  const scrollContainer = isScrollContainer ? products : window;
+
+  // параметры анимации
+  const DURATION = 600;      // длительность прокрутки в мс
+  const OFFSET_RATIO = 0; // поднять элемент на 5% выше центра (увеличьте, чтобы поднять ещё выше)
+
+  // выполняем плавный скролл и подсветку
+  requestAnimationFrame(() => {
+    setTimeout(async () => {
+      try {
+        await scrollElementToCenter(cardEl, scrollContainer, OFFSET_RATIO, DURATION);
+
+        // подсветка и фокус после завершения скролла
+        cardEl.classList.add('new-card-highlight');
+        if (!cardEl.hasAttribute('tabindex')) cardEl.setAttribute('tabindex', '-1');
+        try { cardEl.focus({ preventScroll: true }); } catch (e) { cardEl.focus(); }
+
+        // aria-уведомление
+        announceForAccessibility('Карточка Smart-вклада добавлена и выделена.');
+
+        // убрать подсветку через 2.5 сек
+        setTimeout(() => cardEl.classList.remove('new-card-highlight'), 2500);
+      } catch (err) {
+        console.warn('Ошибка при скролле к карточке:', err);
+      }
+    }, 40);
+  });
+
+  // обнуляем pendingCard (замыкания используют cardEl)
   pendingCard = null;
 
-  // Закрываем диалог, если он ещё открыт
+  // Закрываем диалог
   if (dlg) {
     if (typeof dlg._closeDeposit === 'function') dlg._closeDeposit();
     else if (typeof dlg.close === 'function') {
       try { dlg.close(); } catch (err) {}
     } else dlg.setAttribute('hidden', '');
   }
+}
+
+
+/* Небольшая утилита: объявление для скринридеров */
+function announceForAccessibility(message) {
+  let live = document.getElementById('a11y-live-region');
+  if (!live) {
+    live = document.createElement('div');
+    live.id = 'a11y-live-region';
+    live.setAttribute('aria-live', 'polite');
+    live.setAttribute('aria-atomic', 'true');
+    // Скрываем от визуального рендера, но оставляем доступным для скринридеров
+    live.style.position = 'absolute';
+    live.style.width = '1px';
+    live.style.height = '1px';
+    live.style.margin = '-1px';
+    live.style.border = '0';
+    live.style.padding = '0';
+    live.style.clip = 'rect(0 0 0 0)';
+    live.style.overflow = 'hidden';
+    document.body.appendChild(live);
+  }
+  live.textContent = ''; // сброс
+  // небольшой таймаут чтобы screen readers заметили обновление
+  setTimeout(() => { live.textContent = message; }, 50);
 }
 
 function cancelPending() {
@@ -769,24 +889,6 @@ function openInfo(card){
   dlgInfo.showModal();
 }
 
-// function openInfo(card){
-//   pendingCard = card;
-
-//   ['bank','sum','income','incomeDelta','count','max','end','next']
-//     .forEach(key=>{
-//       const el = dlgInfo.querySelector(`[data-field="${key}"]`);
-//       if (el) el.textContent = card.dataset[key] || '—';
-//     });
-
-//   dlgInfo.querySelector('.goal-list').innerHTML =
-//     (card.dataset.goals||'')
-//       .split('|').filter(Boolean).map(t=>`<li>${t}</li>`).join('');
-//   dlgInfo.querySelector('.achv-list').innerHTML =
-//     (card.dataset.achv||'')
-//       .split('|').filter(Boolean).map(t=>`<li>${t}</li>`).join('');
-
-//   dlgInfo.showModal();
-// }
 
 dlgInfo.querySelector('.dlg-x')
        .addEventListener('click', () => dlgInfo.close());
@@ -813,8 +915,425 @@ btnYes.addEventListener('click', () => {
 btnCancelClose.addEventListener('click', () => dlgClose.close());
 
 
+// --- Динамическая модалка "Текущие вклады" (создаётся при первом вызове) ---
+function createDepositsDialog() {
+  if (document.getElementById('dlg-deposits')) return document.getElementById('dlg-deposits');
 
-        
+  const dlg = document.createElement('dialog');
+  dlg.id = 'dlg-deposits';
+  dlg.className = 'dlg dlg-info';
+  dlg.innerHTML = `
+    <header class="dlg-header">
+      <p class="bank-name">Текущие вклады</p>
+      <button class="dlg-x" aria-label="Закрыть">×</button>
+    </header>
+
+    <section style="margin-bottom:18px;">
+      <ul class="deposits-list" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px"></ul>
+    </section>
+
+    <footer style="display:flex;gap:12px;">
+      <button class="btn dlg-close" type="button">Закрыть</button>
+    </footer>
+  `;
+  document.body.appendChild(dlg);
+
+  // close handlers
+  const closeDlg = () => {
+    try { dlg.close(); } catch (e) { dlg.setAttribute('hidden',''); }
+  };
+  dlg.querySelector('.dlg-x').addEventListener('click', closeDlg);
+  dlg.querySelector('.dlg-close').addEventListener('click', closeDlg);
+
+  dlg.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDlg();
+  });
+
+  // backdrop click close (если native dialog поддерживается, проверим целевой элемент)
+  dlg.addEventListener('click', (e) => {
+    if (e.target === dlg) closeDlg();
+  });
+
+  return dlg;
+}
+
+// --- Показываем разбивку по вкладам (MVP: одна запись из карточки) ---
+function showDepositsDetailsFromCard(card) {
+  if (!card) return;
+  const dlg = createDepositsDialog();
+  const list = dlg.querySelector('.deposits-list');
+  list.innerHTML = ''; // очистить
+
+  // MVP: все средства в одном банке
+  const bankName = card.dataset.bank || card.getAttribute('data-bank') || '—';
+  const sum = card.dataset.sum || card.getAttribute('data-sum') || '0 ₽';
+  // Внешний вид записи — можно расширить (счет, проценты и т.д.)
+  const li = document.createElement('li');
+  li.style.display = 'flex';
+  li.style.justifyContent = 'space-between';
+  li.style.alignItems = 'center';
+  li.style.padding = '10px';
+  li.style.background = '#f6f6f6';
+  li.style.borderRadius = '10px';
+  li.innerHTML = `<div>
+                    <div style="font-weight:600">${escapeHtml(bankName)}</div>
+                    <div style="font-size:13px;color:#666">Счёт: основной</div>
+                  </div>
+                  <div style="text-align:right">
+                    <div style="font-weight:700">${escapeHtml(sum)}</div>
+                    <div style="font-size:12px;color:#666">Всего</div>
+                  </div>`;
+  list.appendChild(li);
+
+  // общий итог (если нужно)
+  const total = document.createElement('li');
+  total.style.marginTop = '8px';
+  total.style.paddingTop = '8px';
+  total.style.borderTop = '1px solid rgba(0,0,0,0.06)';
+  total.innerHTML = `<div style="font-weight:600">Итого</div><div style="font-weight:700;margin-top:6px">${escapeHtml(sum)}</div>`;
+  list.appendChild(total);
+
+  // открыть диалог
+  try { dlg.showModal(); } catch (e) { dlg.removeAttribute('hidden'); }
+
+  // фокус на закрытие для доступности
+  dlg.querySelector('.dlg-close').focus();
+}
+
+// --- Подключаем кликабельность к полю "Текущих вкладов" в dlgInfo ---
+// Делаем это при каждом открытии openInfo — там мы уже заполняем поля.
+// Здесь добавляем слушатель один раз на элемент .val с data-field="count".
+(function bindCountClick() {
+  const countEl = dlgInfo.querySelector('[data-field="count"]');
+  if (!countEl) return;
+
+  // ищем родитель .metric
+  const metricEl = countEl.closest('.metric');
+  if (!metricEl) return;
+
+  // защита от двойного вешания
+  if (metricEl.dataset._depositsBound === '1') return;
+  metricEl.dataset._depositsBound = '1';
+
+  // ставим класс на сам .metric (а не на число)
+  metricEl.classList.add('clickable');
+
+  metricEl.addEventListener('click', (e) => {
+    // приоритет: реальная карточка в pendingCard (если открыт info), иначе собрать из dlgInfo
+    const currentCard = pendingCard || (function(){
+      const fake = document.createElement('div');
+      fake.dataset = {};
+      fake.dataset.bank = dlgInfo.querySelector('[data-field="bank"]')?.textContent?.trim() || '';
+      fake.dataset.sum  = dlgInfo.querySelector('[data-field="sum"]')?.textContent?.trim() || '0 ₽';
+      return fake;
+    })();
+
+    showDepositsDetailsFromCard(currentCard);
+  });
+
+  // на клавиши: Enter/Space тоже должны открывать (доступность)
+  metricEl.tabIndex = metricEl.tabIndex || 0;
+  metricEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      metricEl.click();
+    }
+  });
+})();
+
+ 
+/* ---- Диалог изменения срока вклада (term dialog) ---- */
+function createTermDialog() {
+  if (document.getElementById('dlg-term')) return document.getElementById('dlg-term');
+
+  const dlg = document.createElement('dialog');
+  dlg.id = 'dlg-term';
+  dlg.className = 'dlg dlg-info';
+  dlg.innerHTML = `
+    <header class="dlg-header">
+      <p class="bank-name">Изменить максимальный срок</p>
+      <button class="dlg-x" aria-label="Закрыть">×</button>
+    </header>
+
+    <section style="margin-bottom:14px;">
+      <label style="display:block;margin-bottom:8px;font-size:13px">Максимальный срок (месяцев)</label>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <input id="term-range" type="range" min="0" max="60" step="1" style="flex:1" />
+        <input id="term-number" type="number" min="0" max="60" step="1" style="width:80px" />
+      </div>
+      <div style="margin-top:10px;font-size:13px;color:#555">
+        Ожидаемая дата окончания: <span id="term-end" style="font-weight:600"></span>
+      </div>
+    </section>
+
+    <footer style="display:flex;gap:12px;">
+      <button class="btn btn-dark" id="term-confirm" type="button">Сохранить</button>
+      <button class="btn dlg-close" type="button">Отмена</button>
+    </footer>
+  `;
+  document.body.appendChild(dlg);
+
+  // elements
+  const range = dlg.querySelector('#term-range');
+  const number = dlg.querySelector('#term-number');
+  const endSpan = dlg.querySelector('#term-end');
+  const btnConfirm = dlg.querySelector('#term-confirm');
+  const btnCancel = dlg.querySelector('.dlg-close');
+  const btnX = dlg.querySelector('.dlg-x');
+
+  // helper to update end date text
+  function updateEndDisplay(val) {
+    const months = Number(val) || 0;
+    const d = addDays(new Date(), months * 30);
+    endSpan.textContent = d;
+  }
+
+  // sync inputs
+  range.addEventListener('input', (e) => {
+    number.value = e.target.value;
+    updateEndDisplay(e.target.value);
+  });
+  number.addEventListener('input', (e) => {
+    let v = e.target.value;
+    if (v === '') v = 0;
+    range.value = v;
+    updateEndDisplay(v);
+  });
+
+  // close handlers
+  function closeDlg() {
+    try { dlg.close(); } catch (e) { dlg.setAttribute('hidden',''); }
+  }
+
+  // закрываем только по крестику и по кнопке "Отмена" (если хотите оставить "Отмена")
+  btnX.addEventListener('click', closeDlg);
+  btnCancel.addEventListener('click', closeDlg);
+
+  // ОСТАВЛЯЕМ обработку клавиши Esc (если хотите отключить — удалите этот обработчик)
+  dlg.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDlg(); });
+
+  // УБРАЛИ backdrop-клик: раньше здесь был обработчик, который закрывал диалог при клике в фон.
+  // dlg.addEventListener('click', (e) => { if (e.target === dlg) closeDlg(); });
+
+  // confirm handler will be set dynamically via showTermDialogFromCard (we remove previous listener to avoid дублей)
+  dlg._setConfirmHandler = (fn) => {
+    btnConfirm.replaceWith(btnConfirm.cloneNode(true)); // удаляем старые обработчики
+    const newBtn = dlg.querySelector('#term-confirm') || dlg.querySelector('.btn.btn-dark');
+    newBtn.addEventListener('click', fn);
+  };
+
+  dlg._setValues = (months) => {
+    range.value = months;
+    number.value = months;
+    updateEndDisplay(months);
+  };
+
+  return dlg;
+}
+
+
+function showTermDialogFromCard(card) {
+  if (!card) return;
+  const dlg = createTermDialog();
+
+  const raw = (card.dataset && card.dataset.max) ? card.dataset.max : (card.getAttribute && card.getAttribute('data-max')) || '';
+  const m = parseInt((raw.match(/\d+/) || [0])[0], 10) || 0;
+
+  dlg._setValues(m);
+
+  // удаляем предыдущий confirm handler и ставим новый
+  dlg._setConfirmHandler(() => {
+    const newMonths = Number(dlg.querySelector('#term-number').value) || 0;
+    if (card && card.dataset) {
+      card.dataset.max = newMonths + ' мес';
+      card.dataset.end = addDays(new Date(), newMonths * 30);
+    }
+
+    const infoMaxEl = dlgInfo.querySelector('[data-field="max"]');
+    const infoEndEl = dlgInfo.querySelector('[data-field="end"]');
+    if (infoMaxEl) infoMaxEl.textContent = (card.dataset && card.dataset.max) ? card.dataset.max : (newMonths + ' мес');
+    if (infoEndEl) infoEndEl.textContent = (card.dataset && card.dataset.end) ? card.dataset.end : addDays(new Date(), newMonths * 30);
+
+
+    // закрыть диалог
+    try { dlg.close(); } catch(e) { dlg.setAttribute('hidden',''); }
+  });
+
+  // открыть диалог
+  try { dlg.showModal(); } catch (e) { dlg.removeAttribute('hidden'); }
+  // фокус на числовое поле
+  const num = dlg.querySelector('#term-number');
+  setTimeout(() => num.focus(), 50);
+}
+
+/* ---- Вешаем обработчик на блок "Макс. срок" внутри dlgInfo ---- */
+(function bindMaxTermClick() {
+  const maxField = dlgInfo.querySelector('[data-field="max"]');
+  if (!maxField) return;
+  const metricEl = maxField.closest('.metric');
+  if (!metricEl) return;
+  if (metricEl.dataset._termBound === '1') return;
+  metricEl.dataset._termBound = '1';
+
+  metricEl.classList.add('max-term', 'clickable');
+  // делаем доступным для клавиатуры
+  if (!metricEl.hasAttribute('tabindex')) metricEl.tabIndex = 0;
+
+  metricEl.addEventListener('click', () => {
+    // Приоритет: real card (pendingCard) — если открыт info, pendingCard установлен; иначе собираем fake
+    const currentCard = pendingCard || (function(){ 
+      const fake = document.createElement('div');
+      fake.dataset = {};
+      fake.dataset.max = dlgInfo.querySelector('[data-field="max"]')?.textContent?.trim() || '';
+      fake.dataset.end = dlgInfo.querySelector('[data-field="end"]')?.textContent?.trim() || '';
+      fake.dataset.bank = dlgInfo.querySelector('[data-field="bank"]')?.textContent?.trim() || '';
+      return fake;
+    })();
+
+    showTermDialogFromCard(currentCard);
+  });
+
+  metricEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      metricEl.click();
+    }
+  });
+})();
+
+
+
+/* ====== Top-up / Пополнить вклад (MVP) ====== */
+function createTopupDialog() {
+  if (document.getElementById('dlg-topup')) return document.getElementById('dlg-topup');
+
+  const dlg = document.createElement('dialog');
+  dlg.id = 'dlg-topup';
+  dlg.className = 'dlg dlg-info';
+  dlg.innerHTML = `
+    <header class="dlg-header">
+      <p class="bank-name">Пополнить вклад</p>
+      <button class="dlg-x" aria-label="Закрыть">×</button>
+    </header>
+
+    <section style="margin-bottom:12px;">
+      <div style="margin-bottom:8px">Выберите сумму для пополнения</div>
+      <div class="topup-quick" role="list">
+        <button type="button" data-amount="5000">5 000 ₽</button>
+        <button type="button" data-amount="10000">10 000 ₽</button>
+        <button type="button" data-amount="25000">25 000 ₽</button>
+        <button type="button" data-amount="50000">50 000 ₽</button>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
+        <label style="font-size:13px;">Другая сумма</label>
+        <input id="topup-amount" type="number" min="1" step="100" inputmode="numeric" />
+      </div>
+
+      <div class="topup-note">После подтверждения вы перейдёте на сайт оплаты (sber.ru) для завершения платежа.</div>
+    </section>
+
+    <footer style="display:flex;gap:12px;">
+      <button class="btn btn-dark" id="topup-confirm" type="button">Перейти к оплате</button>
+      <button class="btn dlg-close" type="button">Отмена</button>
+    </footer>
+  `;
+  document.body.appendChild(dlg);
+
+  const quick = Array.from(dlg.querySelectorAll('.topup-quick [data-amount]'));
+  const amountInp = dlg.querySelector('#topup-amount');
+  const btnConfirm = dlg.querySelector('#topup-confirm');
+  const btnCancel = dlg.querySelector('.dlg-close');
+  const btnX = dlg.querySelector('.dlg-x');
+
+  function setActiveButtonByValue(val) {
+    quick.forEach(b => {
+      if (String(+b.dataset.amount) === String(+val)) b.classList.add('active');
+      else b.classList.remove('active');
+    });
+  }
+  function parseRubToNumber(s) {
+    if (s == null) return 0;
+    if (typeof s === 'number') return s;
+    return Number(String(s).replace(/[^\d.-]/g, '')) || 0;
+  }
+
+  quick.forEach(b => {
+    b.addEventListener('click', () => {
+      const a = +b.dataset.amount;
+      amountInp.value = a;
+      setActiveButtonByValue(a);
+      amountInp.focus();
+    });
+  });
+
+  amountInp.addEventListener('input', () => setActiveButtonByValue(amountInp.value));
+
+  function closeDlg() {
+    try { dlg.close(); } catch (e) { dlg.setAttribute('hidden',''); }
+  }
+  btnX.addEventListener('click', closeDlg);
+  btnCancel.addEventListener('click', closeDlg);
+  dlg.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDlg(); });
+
+  btnConfirm.addEventListener('click', () => {
+    const val = parseRubToNumber(amountInp.value);
+    if (!val || val <= 0) {
+      amountInp.focus();
+      amountInp.classList.add('invalid');
+      setTimeout(() => amountInp.classList.remove('invalid'), 900);
+      return;
+    }
+
+    const redirectUrl = 'https://www.sber.ru';
+    window.open(redirectUrl, '_blank');
+
+    closeDlg();
+
+    announceForAccessibility('Перенаправление на платежный сайт для суммы ' + formatRub(val));
+  });
+
+  return dlg;
+}
+
+function showTopupFromCard(card) {
+  const dlg = createTopupDialog();
+
+  const suggested = card ? parseInt((card.dataset?.sum || card.getAttribute && card.getAttribute('data-sum') || '0').replace(/[^\d]/g,''), 10) || '' : '';
+  const amountInp = dlg.querySelector('#topup-amount');
+  if (suggested) {
+    amountInp.value = suggested;
+    setTimeout(() => amountInp.select(), 50);
+  } else {
+    amountInp.value = '';
+  }
+
+  try { dlg.showModal(); } catch (e) { dlg.removeAttribute('hidden'); }
+  amountInp.focus();
+}
+
+(function bindTopupFromInfo() {
+  const btn = dlgInfo.querySelector('footer .btn-dark');
+  if (!btn) return;
+  if (btn.dataset._topupBound === '1') return;
+  btn.dataset._topupBound = '1';
+
+  btn.addEventListener('click', () => {
+    const card = pendingCard || (function(){
+      const fake = document.createElement('div');
+      fake.dataset = {};
+      fake.dataset.sum = dlgInfo.querySelector('[data-field="sum"]')?.textContent || '0 ₽';
+      fake.dataset.bank = dlgInfo.querySelector('[data-field="bank"]')?.textContent || '';
+      return fake;
+    })();
+
+    showTopupFromCard(card);
+  });
+})();
+
+
+
+
 // пояснения для оформления вклада 
 const icons = document.querySelectorAll('.info-icon');
 
