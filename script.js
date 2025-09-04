@@ -334,25 +334,38 @@ const banner   = $('.banner');
 const dlgAlert = $('#dlg-alert');
 const dlg = document.getElementById('dlg-alert'); 
 (() => {
-  // --- Получаем элемент (работает с $ (jQuery-подобным) или без него) ---
-  const raw = (typeof $ === 'function') ? $('#dlg-alert') : null;
-  const dlg = raw
-    ? (raw instanceof Element ? raw : raw[0])   // если $ вернул DOM-узел или jQuery-объект
-    : document.getElementById('dlg-alert');
+  // получаем dialog (поддержка $ (jQuery) или document.getElementById)
+  let dlg = null;
+  if (typeof $ === 'function') {
+    try {
+      const raw = $('#dlg-alert');
+      dlg = raw instanceof Element ? raw : (raw && raw[0]) || null;
+    } catch (e) { dlg = null; }
+  }
+  if (!dlg) dlg = document.getElementById('dlg-alert');
 
   if (!dlg) {
-    console.warn('Диалог #dlg-alert не найден');
+    console.warn('Диалог #dlg-alert не найден на странице.');
     return;
   }
 
-  const checkbox = dlg.querySelector('#openAgree');
-  const btnConfirm = dlg.querySelector('#confirmOpen');
-  const btnCancel = dlg.querySelector('.dlg-cancel');
+  // ищем элементы — пробуем несколько вариантов селекторов для устойчивости
+  const checkbox = dlg.querySelector('#openAgree') || dlg.querySelector('input[type="checkbox"][id*="open"]');
+  const btnConfirm = dlg.querySelector('#confirmOpen') || dlg.querySelector('.btn.btn-dark-new') || dlg.querySelector('button[id*="confirm"]');
+  const btnCancel = dlg.querySelector('#backToForm')   // id backToForm
+                   || dlg.querySelector('.dlg-back')   // класс dlg-back
+                   || dlg.querySelector('.dlg-cancel') // старый класс
+                   || dlg.querySelector('.btn.dlg-close') // ещё один вариант
+                   || null;
 
-  // Защита: если чего-то нет — лог и выход
-  if (!checkbox || !btnConfirm || !btnCancel) {
-    console.warn('В модалке отсутствуют необходимые элементы: checkbox / confirm / cancel');
-    return;
+  const missing = [];
+  if (!checkbox) missing.push('checkbox (#openAgree)');
+  if (!btnConfirm) missing.push('confirm button (#confirmOpen)');
+  if (!btnCancel) missing.push('back/cancel button (#backToForm / .dlg-back / .dlg-cancel)');
+
+  if (missing.length) {
+    console.warn('В модалке отсутствуют необходимые элементы:', missing.join(', '), '. Скрипт будет работать частично.');
+    // не возвращаем — продолжим и повесим те обработчики, которые можем
   }
 
   // --- Состояние фокуса для восстановления ---
@@ -361,18 +374,14 @@ const dlg = document.getElementById('dlg-alert');
   // --- Вспомогательные: открыть / закрыть модалку ---
   function showDialog() {
     previousActive = document.activeElement;
-    // если браузер поддерживает <dialog>
     if (typeof dlg.showModal === 'function') {
-      try { dlg.showModal(); }
-      catch (e) { /* если уже открыт или ошибка — игнор */ }
+      try { dlg.showModal(); } catch (e) {}
     } else {
       dlg.removeAttribute('hidden');
       dlg.setAttribute('aria-modal', 'true');
     }
-    // фокус на чекбоксе (или на кнопке, если нужно)
-    checkbox.focus();
-    // синхронизируем кнопку (вдруг состояние осталось)
-    btnConfirm.disabled = !checkbox.checked;
+    if (checkbox) checkbox.focus();
+    if (btnConfirm && checkbox) btnConfirm.disabled = !checkbox.checked;
   }
 
   function closeDialog(reason = 'cancel') {
@@ -382,35 +391,40 @@ const dlg = document.getElementById('dlg-alert');
       dlg.setAttribute('hidden', '');
       dlg.removeAttribute('aria-modal');
     }
-    // восстановим фокус
     if (previousActive && typeof previousActive.focus === 'function') {
       previousActive.focus();
       previousActive = null;
     }
-    // чистим чекбокс чтобы при следующем открытии было предсказуемо
-    checkbox.checked = false;
-    btnConfirm.disabled = true;
+    if (checkbox) {
+      checkbox.checked = false;
+      if (btnConfirm) btnConfirm.disabled = true;
+    }
   }
 
   // --- Логика активации кнопки по чекбоксу ---
-  checkbox.addEventListener('change', () => {
-    btnConfirm.disabled = !checkbox.checked;
-  });
+  if (checkbox && btnConfirm) {
+    checkbox.addEventListener('change', () => {
+      btnConfirm.disabled = !checkbox.checked;
+    });
+  }
 
   // --- Обработчики кнопок ---
-  btnConfirm.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (btnConfirm.disabled) return;
-    // высылаем событие, чтобы основной код сделал списание/открытие вклада
-    dlg.dispatchEvent(new CustomEvent('deposit:confirm', { detail: { timestamp: Date.now() } }));
-    closeDialog('confirm');
-  });
+  if (btnConfirm) {
+    btnConfirm.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (btnConfirm.disabled) return;
+      dlg.dispatchEvent(new CustomEvent('deposit:confirm', { detail: { timestamp: Date.now() } }));
+      closeDialog('confirm');
+    });
+  }
 
-  btnCancel.addEventListener('click', (e) => {
-    e.preventDefault();
-    dlg.dispatchEvent(new CustomEvent('deposit:cancel', { detail: { timestamp: Date.now() } }));
-    closeDialog('cancel');
-  });
+  if (btnCancel) {
+    btnCancel.addEventListener('click', (e) => {
+      e.preventDefault();
+      dlg.dispatchEvent(new CustomEvent('deposit:cancel', { detail: { timestamp: Date.now() } }));
+      closeDialog('cancel');
+    });
+  }
 
   // --- Обработка клавиш внутри модалки ---
   dlg.addEventListener('keydown', (e) => {
@@ -419,11 +433,9 @@ const dlg = document.getElementById('dlg-alert');
       dlg.dispatchEvent(new CustomEvent('deposit:cancel', { detail: { by: 'escape' } }));
       closeDialog('cancel');
     } else if (e.key === 'Enter') {
-      // если Enter и кнопка активна — подтвердить
-      // но если фокус в чекбоксе — стандартное поведение toggle оставим
       const active = document.activeElement;
       const inCheckbox = active === checkbox;
-      if (!btnConfirm.disabled && !inCheckbox) {
+      if (btnConfirm && !btnConfirm.disabled && !inCheckbox) {
         e.preventDefault();
         dlg.dispatchEvent(new CustomEvent('deposit:confirm', { detail: { by: 'enter' } }));
         closeDialog('confirm');
@@ -431,42 +443,21 @@ const dlg = document.getElementById('dlg-alert');
     }
   });
 
-  // --- Обработка клика по backdrop (опционально) ---
-  // если хотите закрывать при клике по затемнению — раскомментируйте:
-  /*
-  dlg.addEventListener('click', (e) => {
-    if (e.target === dlg) { // клик именно по фону
-      dlg.dispatchEvent(new CustomEvent('deposit:cancel', { detail: { by: 'backdrop' } }));
-      closeDialog('cancel');
-    }
-  });
-  */
-
   // --- Обработчик события cancel (на native <dialog>) ---
   dlg.addEventListener('cancel', (e) => {
-    // предотвращаем автоматическое закрытие, если нужно — или просто обрабатываем
-    // e.preventDefault();
     dlg.dispatchEvent(new CustomEvent('deposit:cancel', { detail: { by: 'native-cancel' } }));
     closeDialog('cancel');
   });
 
-  // --- Публичный API: показываем модалку через dlg._openDeposit() ---
-  // Можно вызвать dlg._openDeposit() извне, чтобы открыть диалог.
+  // --- Публичный API ---
   dlg._openDeposit = showDialog;
   dlg._closeDeposit = () => closeDialog('programmatic');
 
-  // --- Пример: подписка на подтверждение/отмену ---
-  // В основном коде используйте:
-  // dlg.addEventListener('deposit:confirm', e => { /* выполнить списание */ });
-  // dlg.addEventListener('deposit:cancel', e => { /* логика отмены */ });
-
-  // Автоматически синхронизируем состояние при инициализации
-  btnConfirm.disabled = !checkbox.checked;
-
-  // --- Если нужно: открываем автоматически (удалите/закомментируйте) ---
-  // showDialog();
+  // синхронизируем начальное состояние кнопки
+  if (btnConfirm && checkbox) btnConfirm.disabled = !checkbox.checked;
 
 })();
+
 
 
 
@@ -492,32 +483,50 @@ function formatRub(n) {
 form.addEventListener('submit', e => {
   e.preventDefault();
 
+  const initial = +document.getElementById('initial').value || 0;
   const monthly = +document.getElementById('monthly').value || 0;
   const term    = +document.getElementById('term').value    || 0;
-  const sum     = monthly;
+  const sum     = initial;
   const today   = new Date();
 
   // собираем карточку (клонируем шаблон)
   const card = tplSmart.content.firstElementChild.cloneNode(true);
 
-  const income = sum * 0.12; // ваша формула
+  const rateValue = 0.12; // текущая ставка (годовых) для примера
+  const income = sum * rateValue; // простая оценка дохода
 
   Object.assign(card.dataset, {
-    bank   : 'Т-банк',
+    bank   : 'Smart-Вклад',
     sum    : formatRub(sum),
+    monthly: formatRub(monthly),
     income : formatRub(sum + income),
     incomeDelta : '(+' + formatRub(income).replace(' ₽','') + ' ₽)',
-    count  : '1',
+    count  : '2',
     max    : term + ' мес',
     end    : addDays(today, term*30), // предполагается, что addDays определён
     next   : addDays(today, 30),
     goals  : 'Накопить 150 000 ₽ на машину',
-    achv   : 'Самурай|Вин-стрик'
+    achv   : 'Самурай|Вин-стрик',
+    rate   : Math.round(rateValue * 1000) / 10 + '% годовых'
   });
 
   card.querySelector('[data-el="sum"]').textContent    = card.dataset.sum;
   card.querySelector('[data-el="income"]').textContent = (income).toLocaleString('ru-RU') + ' ₽';
   card.querySelector('[data-el="count"]').textContent  = card.dataset.count;
+
+  // Добавим отображение текущей ставки в карточку (третья «клетка» в c-meta)
+  (function ensureRateMeta() {
+    try {
+      const meta = card.querySelector('.c-meta');
+      if (meta && !meta.querySelector('[data-el="rate"]')) {
+        const rateDiv = document.createElement('div');
+        rateDiv.innerHTML = '<small>Ставка</small><span data-el="rate"></span>';
+        meta.appendChild(rateDiv);
+      }
+      const rateSpan = card.querySelector('[data-el="rate"]');
+      if (rateSpan) rateSpan.textContent = card.dataset.rate || '';
+    } catch (e) {}
+  })();
 
   // не вешаем card.addEventListener('click', ...) пока не вставим в DOM —
   // вешаем это при подтверждении.
@@ -931,10 +940,6 @@ function createDepositsDialog() {
     <section style="margin-bottom:18px;">
       <ul class="deposits-list" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px"></ul>
     </section>
-
-    <footer style="display:flex;gap:12px;">
-      <button class="btn dlg-close" type="button">Закрыть</button>
-    </footer>
   `;
   document.body.appendChild(dlg);
 
@@ -943,7 +948,8 @@ function createDepositsDialog() {
     try { dlg.close(); } catch (e) { dlg.setAttribute('hidden',''); }
   };
   dlg.querySelector('.dlg-x').addEventListener('click', closeDlg);
-  dlg.querySelector('.dlg-close').addEventListener('click', closeDlg);
+  const footerCloseBtn = dlg.querySelector('.dlg-close, .dlg-close-2');
+  if (footerCloseBtn) footerCloseBtn.addEventListener('click', closeDlg);
 
   dlg.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeDlg();
@@ -964,40 +970,51 @@ function showDepositsDetailsFromCard(card) {
   const list = dlg.querySelector('.deposits-list');
   list.innerHTML = ''; // очистить
 
-  // MVP: все средства в одном банке
-  const bankName = card.dataset.bank || card.getAttribute('data-bank') || '—';
-  const sum = card.dataset.sum || card.getAttribute('data-sum') || '0 ₽';
-  // Внешний вид записи — можно расширить (счет, проценты и т.д.)
-  const li = document.createElement('li');
-  li.style.display = 'flex';
-  li.style.justifyContent = 'space-between';
-  li.style.alignItems = 'center';
-  li.style.padding = '10px';
-  li.style.background = '#f6f6f6';
-  li.style.borderRadius = '10px';
-  li.innerHTML = `<div>
-                    <div style="font-weight:600">${escapeHtml(bankName)}</div>
-                    <div style="font-size:13px;color:#666">Счёт: основной</div>
-                  </div>
-                  <div style="text-align:right">
-                    <div style="font-weight:700">${escapeHtml(sum)}</div>
-                    <div style="font-size:12px;color:#666">Всего</div>
-                  </div>`;
-  list.appendChild(li);
+  // Разбивка по двум банкам для наглядности
+  const totalSum = card.dataset.sum || card.getAttribute('data-sum') || '0 ₽';
+  const totalNum = Number(String(totalSum).replace(/[^\d.-]/g, '')) || 0;
+  const partA = Math.round(totalNum * 0.6);
+  const partB = totalNum - partA;
 
-  // общий итог (если нужно)
+  const deposits = [
+    { bank: 'Т-Банк', sum: formatRub(partA), rate: '12.0%' },
+    { bank: 'ВТБ',    sum: formatRub(partB), rate: '11.3%' }
+  ];
+
+  deposits.forEach(d => {
+    const li = document.createElement('li');
+    li.style.display = 'flex';
+    li.style.justifyContent = 'space-between';
+    li.style.alignItems = 'center';
+    li.style.padding = '10px';
+    li.style.background = '#f6f6f6';
+    li.style.borderRadius = '10px';
+    li.innerHTML = `<div>
+                      <div style="font-weight:600">${escapeHtml(d.bank)}</div>
+                      <div style="font-size:13px;color:#666">Ставка: ${escapeHtml(d.rate)}</div>
+                    </div>
+                    <div style="text-align:right">
+                      <div style="font-weight:700">${escapeHtml(d.sum)}</div>
+                      <div style="font-size:12px;color:#666">Всего</div>
+                    </div>`;
+    list.appendChild(li);
+  });
+
+  // общий итог
   const total = document.createElement('li');
   total.style.marginTop = '8px';
   total.style.paddingTop = '8px';
   total.style.borderTop = '1px solid rgba(0,0,0,0.06)';
-  total.innerHTML = `<div style="font-weight:600">Итого</div><div style="font-weight:700;margin-top:6px">${escapeHtml(sum)}</div>`;
+  total.innerHTML = `<div style="font-weight:600">Итого</div><div style="font-weight:700;margin-top:6px">${escapeHtml(totalSum)}</div>`;
   list.appendChild(total);
 
   // открыть диалог
   try { dlg.showModal(); } catch (e) { dlg.removeAttribute('hidden'); }
 
-  // фокус на закрытие для доступности
-  dlg.querySelector('.dlg-close').focus();
+  // фокус на элемент закрытия для доступности
+  const footerCloseBtn2 = dlg.querySelector('.dlg-close, .dlg-close-2');
+  const focusEl = footerCloseBtn2 || dlg.querySelector('.dlg-x');
+  if (focusEl && typeof focusEl.focus === 'function') focusEl.focus();
 }
 
 // --- Подключаем кликабельность к полю "Текущих вкладов" в dlgInfo ---
@@ -1067,8 +1084,8 @@ function createTermDialog() {
     </section>
 
     <footer style="display:flex;gap:12px;">
-      <button class="btn btn-dark" id="term-confirm" type="button">Сохранить</button>
-      <button class="btn dlg-close" type="button">Отмена</button>
+      <button class="btn btn-dark-2" id="term-confirm" type="button">Сохранить</button>
+      <button class="btn dlg-close-2" type="button">Отмена</button>
     </footer>
   `;
   document.body.appendChild(dlg);
@@ -1078,7 +1095,7 @@ function createTermDialog() {
   const number = dlg.querySelector('#term-number');
   const endSpan = dlg.querySelector('#term-end');
   const btnConfirm = dlg.querySelector('#term-confirm');
-  const btnCancel = dlg.querySelector('.dlg-close');
+  const btnCancel = dlg.querySelector('.dlg-close-2');
   const btnX = dlg.querySelector('.dlg-x');
 
   // helper to update end date text
@@ -1649,4 +1666,310 @@ document.addEventListener('click', () => {
   const chk = document.getElementById('openAgree');
   const btn = document.getElementById('confirmOpen');
   chk.addEventListener('change', () => btn.disabled = !chk.checked);
+
+
+// отображение параметров при подтверждении
+// --- Утилита: собрать параметры из формы (если pendingCard пуст) ---
+function collectParamsFromForm() {
+  try {
+    const initial = document.getElementById('initial')?.value || '';
+    const monthly = document.getElementById('monthly')?.value || '';
+    const term = document.getElementById('term')?.value || '';
+    const reserve = document.getElementById('reserve')?.value || '';
+    const freeze = document.getElementById('freeze')?.value || '';
+    const banInput = document.getElementById('ban-input')?.value || '';
+    const goals = (document.querySelector('#goal-input')?.value) || '';
+    return {
+      sum: formatRub(+initial) || '—',
+      monthly: formatRub(+monthly) || '—',
+      max: term ? (term + ' мес') : '—',
+      reserve: reserve ? formatRub(+reserve) : '—',
+      freeze: freeze ? (freeze + ' дн') : '—',
+      ban: banInput ? banInput : '—',
+      goals: goals || '—'
+    };
+  } catch (e) {
+    return {};
+  }
+}
+
+// --- Утилита: заполнить confirm-диалог параметрами из карточки или формы ---
+function populateConfirmDialogFrom(cardOrNull) {
+  const dialog = document.getElementById('dlg-alert');
+  if (!dialog) return;
+
+  const map = {
+    sum: 'sum',
+    monthly: 'monthly',
+    max: 'max',
+    reserve: 'reserve',
+    freeze: 'freeze',
+    ban: 'ban',
+    goals: 'goals'
+  };
+
+  // источник данных: приоритет — card.dataset, иначе форма
+  const src = (cardOrNull && cardOrNull.dataset && Object.keys(cardOrNull.dataset).length) ? cardOrNull.dataset : collectParamsFromForm();
+
+  // заполнение: найдём элементы [data-confirm="..."]
+  Object.keys(map).forEach(key => {
+    const el = dialog.querySelector(`[data-confirm="${key}"]`);
+    if (!el) return;
+    // карта полей: для sum/monthly используем src.sum or src.monthly, для goals — src.goals или card.dataset.goals
+    let val = src[key] || src[map[key]] || '—';
+    // если это строка с pipe goals -> prettify
+    if (key === 'goals' && val && typeof val === 'string') {
+      val = val.replace(/\|/g, ', ') || val;
+    }
+    // для банов (csv) заменить на читабельный вид
+    if (key === 'ban' && val && typeof val === 'string') {
+      val = val.split(',').filter(Boolean).join(', ') || val;
+    }
+    el.textContent = val;
+  });
+
+  // синхронизация чекбокса / кнопки
+  const chk = dialog.querySelector('#openAgree');
+  const btn = dialog.querySelector('#confirmOpen');
+  if (chk && btn) {
+    chk.checked = false;
+    btn.disabled = true;
+    chk.removeEventListener('change', _openAgreeHandler);
+    chk.addEventListener('change', _openAgreeHandler);
+  }
+}
+
+// обработчик для чекбокса (внешняя ссылка, чтобы можно было снять слушатель)
+function _openAgreeHandler(e) {
+  const btn = document.getElementById('confirmOpen');
+  if (btn) btn.disabled = !e.target.checked;
+}
+
+// --- Подменяем поведение отправки формы: перед открытием диалога заполним параметры ---
+(function patchFormSubmitToPopulateDialog() {
+  // Если у вас уже есть обработчик submit — просто убедитесь, что он вызывает populateConfirmDialogFrom(card)
+  // В вашей текущей реализации — form.addEventListener('submit', ...) формирует pendingCard и вызывает dlg._openDeposit().
+  // Поэтому добавим глобальную listener на submit, который заполнит диалог прямо перед открытием.
+  form.addEventListener('submit', (e) => {
+    // после preventDefault и формирования pendingCard в вашем handler — pendingCard будет установлен.
+    // Ждём один микротаск, затем заполним диалог (если pendingCard уже создан).
+    setTimeout(() => {
+      populateConfirmDialogFrom(pendingCard);
+    }, 0);
+  });
+})();
+
+// --- Переназначаем поведение кнопки "Назад" (dlg-back) и confirm/cancel flow ---
+// При клике "Назад" — закрываем подтверждение и возвращаем пользователя в модалку оформления.
+(function bindDlgAlertButtons() {
+  const dialog = document.getElementById('dlg-alert');
+  if (!dialog) return;
+
+  // confirm: уже сольётся с событием deposit:confirm в существующем IIFE, но про запас:
+  dialog.querySelector('#confirmOpen')?.addEventListener('click', (e) => {
+    // если кнопка выключена — ничего не делаем
+    if (e.currentTarget.disabled) return;
+    // далее существующий код слушает deposit:confirm и выполнит confirmInsert()
+    // чтобы использовать тот же поток, отправим событие
+    dialog.dispatchEvent(new CustomEvent('deposit:confirm', { detail: { by: 'confirmButton' } }));
+    // IIFE закрывает диалог; не закрываем здесь дополнительно.
+  });
+
+  // кнопка "Назад"
+  const backBtn = dialog.querySelector('#backToForm') || dialog.querySelector('.dlg-back');
+  if (backBtn) {
+    backBtn.addEventListener('click', (e) => {
+      // Закрываем confirm dialog
+      try { dialog.close(); } catch (err) { dialog.setAttribute('hidden',''); }
+
+      // Открываем smartModal и показываем форму оформления
+      if (smartModal && smartModal.classList) {
+        smartModal.classList.add('show');
+        showStep('form');
+        updateModalTitle();
+      }
+
+      // Предзаполнить форму значениями из pendingCard, если есть
+      if (pendingCard) {
+        // суммарные поля (подберите id полей вашей формы)
+        const initialEl = document.getElementById('initial');
+        const monthlyEl = document.getElementById('monthly');
+        const termEl = document.getElementById('term');
+        const reserveEl = document.getElementById('reserve');
+        const freezeEl = document.getElementById('freeze');
+        const banInput = document.getElementById('ban-input');
+
+        if (initialEl && pendingCard.dataset.sum) {
+          // dataset.sum содержит форматированную сумму "12 000 ₽" — извлечём число
+          initialEl.value = (pendingCard.dataset.sum || '').replace(/[^\d]/g,'') || initialEl.value;
+        }
+        if (monthlyEl && pendingCard.dataset.monthly) {
+          monthlyEl.value = (pendingCard.dataset.monthly || '').replace(/[^\d]/g,'') || monthlyEl.value;
+        }
+        if (termEl && pendingCard.dataset.max) {
+          termEl.value = parseInt((pendingCard.dataset.max || '').match(/\d+/)?.[0] || termEl.value, 10);
+          // обновить отображение рядом с range
+          const ev = new Event('input', { bubbles: true });
+          termEl.dispatchEvent(ev);
+        }
+        if (reserveEl && pendingCard.dataset.reserve) {
+          reserveEl.value = (pendingCard.dataset.reserve || '').replace(/[^\d]/g,'') || reserveEl.value;
+          reserveEl.dispatchEvent(new Event('input'));
+        }
+        if (freezeEl && pendingCard.dataset.freeze) {
+          freezeEl.value = (pendingCard.dataset.freeze || '').match(/\d+/)?.[0] || freezeEl.value;
+        }
+        if (banInput && pendingCard.dataset.ban) {
+          banInput.value = pendingCard.dataset.ban;
+          // если у вас есть UI multi-select — может потребоваться синхронизация через отдельный init
+        }
+      }
+    });
+  }
+})();
+
+
+/* ошибка при сумме меньше 5000 */
+
+// validation: минимальная сумма для number inputs с атрибутом min
+// validation: минимальная сумма для number inputs с атрибутом min
+(function initMinAmountValidation() {
+  const formEl = document.getElementById('depositForm');
+  if (!formEl) return;
+
+  const submitBtn = formEl.querySelector('button[type="submit"]');
+  const numInputs = Array.from(formEl.querySelectorAll('input[type="number"][min]'));
+
+  // state per input: { hasTyped: bool, touched: bool }
+  const state = new WeakMap();
+
+  function minMessageFor(input) {
+    const min = Number(input.getAttribute('min')) || 0;
+    return 'Минимальная сумма — ' + (typeof formatRub === 'function' ? formatRub(min) : (min + ' ₽'));
+  }
+
+  function getOrCreateErrNode(input) {
+    let node = input.nextElementSibling;
+    if (node && node.classList && node.classList.contains('input-error-text')) return node;
+    node = document.createElement('div');
+    node.className = 'input-error-text';
+    node.style.display = 'none';
+    input.insertAdjacentElement('afterend', node);
+    return node;
+  }
+
+  function showError(input) {
+    const errNode = getOrCreateErrNode(input);
+    errNode.textContent = minMessageFor(input);
+    errNode.style.display = 'block';
+    input.classList.add('input-invalid');
+    input.setAttribute('aria-invalid', 'true');
+    // set aria-describedby
+    if (!input.id) input.id = 'inp-' + Math.random().toString(36).slice(2,8);
+    errNode.id = input.id + '-msg';
+    input.setAttribute('aria-describedby', errNode.id);
+  }
+
+  function clearError(input) {
+    const errNode = input.nextElementSibling;
+    if (errNode && errNode.classList && errNode.classList.contains('input-error-text')) {
+      errNode.textContent = '';
+      errNode.style.display = 'none';
+      // remove aria-describedby only if it points to our node
+      if (input.getAttribute('aria-describedby') === errNode.id) input.removeAttribute('aria-describedby');
+    }
+    input.classList.remove('input-invalid');
+    input.removeAttribute('aria-invalid');
+  }
+
+  // Returns boolean valid (true if OK)
+  function isValidValue(input) {
+    const min = Number(input.getAttribute('min')) || 0;
+    const val = Number(input.value) || 0;
+    return val >= min;
+  }
+
+  // validate one input; when show=true display message immediately
+  function validateInput(input, show = false) {
+    const valid = isValidValue(input);
+    const st = state.get(input) || { hasTyped: false, touched: false };
+    if (show && !valid) {
+      showError(input);
+    } else {
+      // hide error if valid OR we shouldn't show
+      if (valid) clearError(input);
+      else if (!show) clearError(input);
+    }
+    return valid;
+  }
+
+  // validate all. When show=false, don't modify DOM; just compute validity
+  function validateAll(show = false) {
+    let results;
+    if (show) {
+      results = numInputs.map(i => validateInput(i, true));
+    } else {
+      results = numInputs.map(i => isValidValue(i));
+    }
+    const allValid = results.every(Boolean);
+    if (submitBtn) submitBtn.disabled = !allValid;
+    return allValid;
+  }
+
+  // init states and listeners
+  numInputs.forEach(inp => {
+    state.set(inp, { hasTyped: false, touched: false });
+
+    // input: mark that user typed; do lightweight validation (no messages) to update submit state
+    inp.addEventListener('input', () => {
+      const st = state.get(inp);
+      st.hasTyped = String(inp.value).trim().length > 0;
+      state.set(inp, st);
+      // live validation: show/hide immediately for this field
+      validateInput(inp, true);
+      // update submit state without changing other fields' messages
+      const allValid = numInputs.every(isValidValue);
+      if (submitBtn) submitBtn.disabled = !allValid;
+    });
+
+    // blur: mark touched and show message if user typed
+    inp.addEventListener('blur', () => {
+      const st = state.get(inp);
+      st.touched = true;
+      state.set(inp, st);
+      // show message on blur for this field
+      validateInput(inp, true);
+      // update submit state
+      const allValid = numInputs.every(isValidValue);
+      if (submitBtn) submitBtn.disabled = !allValid;
+    });
+  });
+
+  // Initial: set submit disabled if invalid, but don't show any messages
+  validateAll(false);
+
+  // final submit guard: if still invalid, prevent submit and focus first invalid
+  formEl.addEventListener('submit', (e) => {
+    const ok = validateAll(true); // show messages for all invalid
+    if (!ok) {
+      e.preventDefault();
+      // focus first invalid input; if none touched, focus first invalid anyway
+      const firstInvalid = numInputs.find(i => !isValidValue(i));
+      if (firstInvalid) {
+        // mark it as touched so user sees message
+        const st = state.get(firstInvalid) || {};
+        st.touched = true;
+        st.hasTyped = String(firstInvalid.value).trim().length > 0;
+        state.set(firstInvalid, st);
+        validateInput(firstInvalid, true);
+        firstInvalid.focus();
+      }
+      return false;
+    }
+    // allow normal submit flow (your other handler will run)
+    return true;
+  });
+})();
+
+
 }); 

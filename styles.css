@@ -457,8 +457,6 @@ h2{
   z-index:1100; /* выше чем контент модалки */
 }
 .modal-title { margin:0; font-size:18px; font-weight:700; line-height:1; }
-.modal-header .close-btn { width:40px; height:40px; border-radius:50%; }
-
 /* заголовок — общий стиль (поддерживает h2 и h3 текста) */
 .modal-title{
   margin:0;
@@ -1632,7 +1630,7 @@ aside.right{
 
 
 .modal-title-wrap {
-  margin-right: 20px
+  margin-right: 30px
 }
 
 
@@ -1699,3 +1697,35 @@ aside.right{
   width:140px;
 }
 .topup-note { font-size:13px; color:#555; margin-top:8px; }
+
+
+/* отображение параметров при подтверждении */
+
+.confirm-params li { display:flex; justify-content:space-between; gap:12px; padding:8px 10px; background:#f6f6f6; border-radius:8px; font-size:13px; }
+.confirm-params strong { opacity:.8; font-weight:600; }
+#dlg-alert .confirm-note {
+  font-size: 11px;        
+  color: #555;            
+  line-height: 1.25;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+
+/* ошибка при сумме меньше 5000 */
+.input-invalid {
+  border-color: #d64545 !important;
+  box-shadow: 0 0 0 3px rgba(214,69,69,0.06);
+  outline: none;
+}
+.input-error-text {
+  color: #d64545;
+  font-size: 12px;
+  margin-top: 6px;
+  line-height: 1;
+  opacity: 0.95;
+}
+.btn[disabled] {
+  opacity: 0.6;
+  pointer-events: none;
+}
