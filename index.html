@@ -318,8 +318,20 @@
           <summary><span>автомобиля</span></summary>
           <ul><li class="current">автомобиля<span class="chk"></span></li><li>мотоцикла<span class="chk"></span></li></ul>
         </details>
-        <small>Даже если купили его в другом месте</small>
-        <div class="osago-input"><input placeholder="A 000 AA 00"><button>Добавить</button></div>
+        <label for="osago-number">Даже если купили его в другом месте</label>
+                <div class="osago-input">
+                    <input 
+                        type="text" 
+                        id="osago-number" 
+                        name="osago_number" 
+                        placeholder="A 000 AA 00" 
+                        pattern="[A-Za-zА-Яа-я]\s\d{3}\s[A-Za-zА-Яа-я]{2}\s\d{2,3}" 
+                        title="Формат: Буква, пробел, 3 цифры, пробел, 2 буквы, пробел, 2-3 цифры"
+                        required
+                    >
+                    <button type="submit">Добавить</button>
+                </div>
+            </div>
       </div>
   
     </aside>
@@ -466,7 +478,7 @@
               <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-monthly"
                     data-tooltip="Первоначальная сумма, которую кладёт пользователь.">i</span>
             </label>
-            <input type="number" id="initial" placeholder="Введите сумму (от 5000 рублей)" min="5000" step="1000">
+            <input type="number" id="initial" name="initial" placeholder="Введите сумму (от 5000 рублей)" min="5000" step="1000">
           </div>
 
           <div class="form-group">
@@ -474,39 +486,36 @@
               <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-monthly"
                     data-tooltip="Сумма, которая будет списываться с вашего счёта со следующего месяца.">i</span>
             </label>
-            <input type="number" id="monthly" placeholder="Введите сумму (от 5000 рублей)" min="5000" step="1000">
+            <input type="number" id="monthly" name="monthly" placeholder="Введите сумму (от 5000 рублей)" min="5000" step="1000">
           </div>
       
           <div class="form-group">
-            <label>Максимальный срок вклада (мес)
-              <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-term"
+            <label for="term">Максимальный срок вклада (мес)
+                <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-term"
                     data-tooltip="Максимальное количество месяцев, на которое вы готовы открыть вклад. Чем больше срок — тем обычно выше ставка.">i</span>
             </label>
             <div class="range-wrap">
-              <span class="range-values" id="termVal">18</span>
-              <input type="range" id="term" min="0" max="36" value="18">
+                <span class="range-values" id="termVal">18</span>
+                <input type="range" id="term" name="term" min="0" max="36" value="18">
             </div>
+        </div>
+        <div class="form-group">
+          <label for="reserve">Резервная сумма (₽)
+            <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-reserve"
+                  data-tooltip="Сумма, которую вы сможете снять в любой момент.">i</span>
+          </label>
+          <div class="range-wrap">
+            <span class="range-values" id="reserveVal">5000</span>
+            <input type="range" id="reserve" name="reserve" min="0" max="10000" value="5000" step="1000">
           </div>
-      
-          <!-- <h4 style="margin:32px 0 18px;font-size:17px">Дополнительно</h4> -->
-      
-          <div class="form-group">
-            <label>Резервная сумма (₽)
-              <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-reserve"
-                    data-tooltip="Сумма, которую вы сможете снять в любой момент.">i</span>
-            </label>
-            <div class="range-wrap">
-              <span class="range-values" id="reserveVal">5000</span>
-              <input type="range" id="reserve" min="0" max="10000" value="5000" step="200">
-            </div>
-          </div>
+        </div>
       
           <div class="form-group">
             <label for="freeze">Период ожидания после закрытия (дней)
               <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-freeze"
                     data-tooltip="Сколько дней после закрытия вклада средства остаются без автоматического реинвестирования. Нужны, чтобы самостоятельно решить: реинвестировать позже или использовать деньги по назначению.">i</span>
             </label>
-            <input type="number" id="freeze" placeholder="Введите число дней (0 — реинвест сразу)" min="0">
+            <input type="number" id="freeze" name="freeze" placeholder="Введите число дней (0 — реинвест сразу)" min="0">
           </div>
                 
           <div class="form-group">

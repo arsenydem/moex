@@ -479,6 +479,30 @@ function formatRub(n) {
   return n.toLocaleString('ru-RU') + ' ₽';
 }
 
+function collectParamsFromForm() {
+  try {
+    const initial = document.getElementById('initial')?.value ?? '';
+    const monthly = document.getElementById('monthly')?.value ?? '';
+    const term    = document.getElementById('term')?.value ?? '';
+    const reserve = document.getElementById('reserve')?.value ?? '';
+    const freeze  = document.getElementById('freeze')?.value ?? '';
+    const banInput = document.getElementById('ban-input')?.value ?? '';
+
+    return {
+      sum: initial !== '' ? formatRub(+initial) : '—',
+      monthly: monthly !== '' ? formatRub(+monthly) : '—',
+      max: term !== '' ? term + ' мес' : '—',
+      reserve: reserve !== '' ? formatRub(+reserve) : '—',
+      freeze: freeze !== '' ? freeze + ' дн' : '—',
+      ban: banInput !== '' ? banInput : '—'
+    };
+  } catch (e) {
+    console.error('collectParamsFromForm error:', e);
+    return {};
+  }
+}
+
+
 // --- Обработчик отправки формы: создаём карточку, но не вставляем ---
 form.addEventListener('submit', e => {
   e.preventDefault();
@@ -509,7 +533,9 @@ form.addEventListener('submit', e => {
     achv   : 'Самурай|Вин-стрик',
     rate   : Math.round(rateValue * 1000) / 10 + '% годовых'
   });
-
+  // добавляем доп. параметры
+  const extras = collectParamsFromForm();
+  Object.assign(card.dataset, extras);
   card.querySelector('[data-el="sum"]').textContent    = card.dataset.sum;
   card.querySelector('[data-el="income"]').textContent = (income).toLocaleString('ru-RU') + ' ₽';
   card.querySelector('[data-el="count"]').textContent  = card.dataset.count;
@@ -1408,11 +1434,11 @@ document.addEventListener('click', () => {
 (function () {
   // Список банков (можно загрузить динамически с сервера)
   const BANKS = [
-    { id: 'sber', name: 'Сбер' },
-    { id: 'tinkoff', name: 'Т-банк' },
-    { id: 'vtb', name: 'ВТБ' },
-    { id: 'alfabank', name: 'Альфа-Банк' },
-    { id: 'gazprom', name: 'Газпромбанк' }
+    { id: 'Сбер', name: 'Сбер' },
+    { id: 'Т-банк', name: 'Т-банк' },
+    { id: 'ВТБ', name: 'ВТБ' },
+    { id: 'Альфа-Банк', name: 'Альфа-Банк' },
+    { id: 'Газпромбанк', name: 'Газпромбанк' }
   ];
 
   function initBanSelect(rootId = 'banSelect') {
@@ -1681,26 +1707,29 @@ document.addEventListener('click', () => {
 // --- Утилита: собрать параметры из формы (если pendingCard пуст) ---
 function collectParamsFromForm() {
   try {
-    const initial = document.getElementById('initial')?.value || '';
-    const monthly = document.getElementById('monthly')?.value || '';
-    const term = document.getElementById('term')?.value || '';
-    const reserve = document.getElementById('reserve')?.value || '';
-    const freeze = document.getElementById('freeze')?.value || '';
-    const banInput = document.getElementById('ban-input')?.value || '';
-    const goals = (document.querySelector('#goal-input')?.value) || '';
+    const initial = document.getElementById('initial')?.value ?? '';
+    const monthly = document.getElementById('monthly')?.value ?? '';
+    const term = document.getElementById('term')?.value ?? '';
+    const reserve = document.getElementById('reserve')?.value ?? '';
+    const freeze = document.getElementById('freeze')?.value ?? '';
+    const banInput = document.getElementById('ban-input')?.value ?? '';
+    const goals = document.querySelector('#goal-input')?.value ?? 'Накопить 150 000 ₽ на машину';
+
     return {
-      sum: formatRub(+initial) || '—',
-      monthly: formatRub(+monthly) || '—',
-      max: term ? (term + ' мес') : '—',
-      reserve: reserve ? formatRub(+reserve) : '—',
-      freeze: freeze ? (freeze + ' дн') : '—',
-      ban: banInput ? banInput : '—',
-      goals: goals || '—'
+      sum: initial !== '' ? formatRub(+initial) : '—',
+      monthly: monthly !== '' ? formatRub(+monthly) : '—',
+      max: term !== '' ? term + ' мес' : '—',
+      reserve: reserve !== '' ? formatRub(+reserve) : '—',
+      freeze: freeze !== '' ? freeze + ' дн' : '—',
+      ban: banInput !== '' ? banInput : '—',
+      goals: goals !== '' ? goals : 'Накопить 150 000 ₽ на машину'
     };
   } catch (e) {
+    console.error('collectParamsFromForm error:', e);
     return {};
   }
 }
+
 
 // --- Утилита: заполнить confirm-диалог параметрами из карточки или формы ---
 function populateConfirmDialogFrom(cardOrNull) {

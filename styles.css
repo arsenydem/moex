@@ -1826,9 +1826,24 @@ aside.right{
 }
 .dlg-info .growth-chart-wrap canvas {
   width:100%;
-  height:160px; /* визуальная высота */
+  height:160px; 
   display:block;
 }
 @media(min-width:900px){
   .dlg-info .growth-chart-wrap canvas { height:220px; }
+}
+
+/* кликабельные текущих вкладов в карточке и макс. срок */
+.metric.clickable {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 6px 10px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.metric.clickable:hover,
+.metric.clickable:focus {
+  border-color: #0077ff;
+  box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.2);
+  outline: none; 
 }
