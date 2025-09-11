@@ -450,8 +450,8 @@
           </fieldset>
       
           <div class="actions">
-            <button class="btn" type="submit">Готово</button>
-            <button class="btn btn-light" id="backInfo2" type="button">← Назад</button>
+            <button class="btn btn-light" type="submit">Готово</button>
+            <button class="btn" id="backInfo2" type="button">← Назад</button>
           </div>
           <div id="surveyResult" class="survey-result" hidden></div>
         </form>
@@ -466,7 +466,7 @@
               <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-monthly"
                     data-tooltip="Первоначальная сумма, которую кладёт пользователь.">i</span>
             </label>
-            <input type="number" id="initial" placeholder="Введите сумму (от 5000 рублей)" min="5000">
+            <input type="number" id="initial" placeholder="Введите сумму (от 5000 рублей)" min="5000" step="1000">
           </div>
 
           <div class="form-group">
@@ -474,7 +474,7 @@
               <span class="info-icon" role="button" tabindex="0" aria-describedby="tip-monthly"
                     data-tooltip="Сумма, которая будет списываться с вашего счёта со следующего месяца.">i</span>
             </label>
-            <input type="number" id="monthly" placeholder="Введите сумму (от 5000 рублей)" min="5000" >
+            <input type="number" id="monthly" placeholder="Введите сумму (от 5000 рублей)" min="5000" step="1000">
           </div>
       
           <div class="form-group">
@@ -529,8 +529,8 @@
 
       
           <footer class="actions">
-            <button class="btn" type="submit">Подобрать вклад</button>
-            <button class="btn btn-light" id="backInfo3" type="button">← Назад</button>
+            <button class="btn btn-light" type="submit">Подобрать вклад</button>
+            <button class="btn" id="backInfo3" type="button">← Назад</button>
           </footer>
         </form>
       </section>

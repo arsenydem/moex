@@ -306,7 +306,7 @@ $('#surveyForm').addEventListener('submit', e=>{
   box.innerHTML = ok
     ? `👍 <strong>SmartВклад подходит вам.</strong><br>
        Вы получите лучшие ставки при минимальных усилиях.<br><br>
-       <button id="resultToForm" class="btn" style="margin-top:8px">
+       <button id="resultToForm" class="btn btn-light" style="margin-top:8px">
          Перейти к оформлению
        </button>`
     : `👀 <strong>SmartВклад сейчас не оптимален.</strong><br>
@@ -977,8 +977,8 @@ function showDepositsDetailsFromCard(card) {
   const partB = totalNum - partA;
 
   const deposits = [
-    { bank: 'Т-Банк', sum: formatRub(partA), rate: '12.0%' },
-    { bank: 'ВТБ',    sum: formatRub(partB), rate: '11.3%' }
+    { bank: 'Т-Банк', sum: partA, rate: '12.0', term: '1', doxod: '300'},
+    { bank: 'ВТБ',    sum: partB, rate: '11.3', term: '2', doxod: '500'}
   ];
 
   deposits.forEach(d => {
@@ -989,16 +989,25 @@ function showDepositsDetailsFromCard(card) {
     li.style.padding = '10px';
     li.style.background = '#f6f6f6';
     li.style.borderRadius = '10px';
-    li.innerHTML = `<div>
-                      <div style="font-weight:600">${escapeHtml(d.bank)}</div>
-                      <div style="font-size:13px;color:#666">Ставка: ${escapeHtml(d.rate)}</div>
-                    </div>
-                    <div style="text-align:right">
-                      <div style="font-weight:700">${escapeHtml(d.sum)}</div>
-                      <div style="font-size:12px;color:#666">Всего</div>
-                    </div>`;
+  
+    // рассчитываем доход (MVP: простая формула)
+    const income = Math.round(d.sum * (d.rate / 100) * (d.term / 12));
+  
+    li.innerHTML = `
+      <div>
+        <div style="font-weight:600">${escapeHtml(d.bank)}</div>
+        <div style="font-size:13px;color:#666">Ставка: ${escapeHtml(d.rate)}%</div>
+        <div style="font-size:13px;color:#666">Срок: ${escapeHtml(d.term)} мес.</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:700">${escapeHtml(d.sum.toLocaleString('ru-RU'))} ₽</div>
+        <div style="font-size:12px;color:#666">Доход: ${d.doxod} ₽</div>
+      </div>
+    `;
+  
     list.appendChild(li);
   });
+  
 
   // общий итог
   const total = document.createElement('li');
@@ -1971,5 +1980,474 @@ function _openAgreeHandler(e) {
   });
 })();
 
+// === Добавить ссылку "Договор оферты" в заголовок dlg-info (добавляется после showModal) ===
+(function attachContractLinkToDlgInfo() {
+  const dlgInfo = document.getElementById('dlg-info');
+  if (!dlgInfo) {
+    console.warn('[contract-dlg] dlg-info not found — skipping');
+    return;
+  }
+
+  // Создаёт (если нужно) глобальный диалог с текстом договора
+  function ensureContractDialog() {
+    let dlg = document.getElementById('dlg-contract');
+    if (dlg) return dlg;
+
+    dlg = document.createElement('dialog');
+    dlg.id = 'dlg-contract';
+    dlg.className = 'dlg dlg-info';
+    dlg.innerHTML = `
+      <header class="dlg-header">
+        <p class="bank-name">Договор оферты</p>
+        <button class="dlg-x" aria-label="Закрыть">×</button>
+      </header>
+      <div class="contract-body" role="document" tabindex="0" style="padding:12px; max-height:66vh; overflow:auto;"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button class="btn dlg-close" type="button">Закрыть</button>
+      </div>
+    `;
+    document.body.appendChild(dlg);
+
+    const btnX = dlg.querySelector('.dlg-x');
+    const btnClose = dlg.querySelector('.dlg-close');
+    function closeDlg() {
+      try { dlg.close(); } catch (e) { dlg.setAttribute('hidden',''); }
+    }
+    btnX.addEventListener('click', closeDlg);
+    btnClose.addEventListener('click', closeDlg);
+    dlg.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDlg(); });
+
+    return dlg;
+  }
+
+  // Более юридический MVP-текст договора (редактируй при необходимости)
+  const contractHtmlLong = `
+    <h2 style="margin-top:0">Договор оферты об открытии депозитного счёта (MVP)</h2>
+    <p><strong>Дата:</strong> ${new Date().toLocaleDateString('ru-RU')}</p>
+
+    <h3>1. Общие положения</h3>
+    <p>1.1. Настоящая публичная оферта (далее — «Оферта») является официальным предложением Банка заключить договор банковского вклада (депозита) на условиях, изложенных в настоящем документе.</p>
+    <p>1.2. Термины: «Банк» — кредитная организация; «Клиент» — физическое лицо, акцептовавшее Оферту; «Вклад» — денежные средства, размещённые Клиентом на счёте Банка.</p>
+
+    <h3>2. Предмет договора</h3>
+    <p>2.1. Банк принимает денежные средства Клиента на депозитный счёт на условиях настоящей Оферты. Акцептом Оферты считается подтверждение Клиентом через интерфейс «Да, открыть» и проставление необходимых согласий.</p>
+
+    <h3>3. Сумма, валюта и порядок внесения</h3>
+    <p>3.1. Первоначальная сумма и возможные пополнения фиксируются при оформлении вклада. Валюта — российский рубль (₽).</p>
+    <p>3.2. Пополнение и порядок списаний регулируются тарифами и условиями продукта и могут требовать дополнительных согласий Клиента.</p>
+
+    <h3>4. Срок вклада и процентная ставка</h3>
+    <p>4.1. Срок вклада и применяемая процентная ставка определяются при оформлении. Процентная ставка может зависеть от срока и суммы вклада.</p>
+    <p>4.2. Порядок начисления процентов, капитализация и выплата определяются тарифами Банка и доводятся до сведения Клиента при оформлении.</p>
+
+    <h3>5. Досрочное расторжение</h3>
+    <p>5.1. Клиент вправе инициировать досрочное расторжение вклада. При этом проценты пересчитываются в соответствии с правилами продукта и тарифами Банка.</p>
+
+    <h3>6. Права и обязанности сторон</h3>
+    <ul>
+      <li>6.1. Банк обязуется: сохранить размещённые средства, начислять проценты и предоставлять информацию в объёме, предусмотренном законодательством и тарифами.</li>
+      <li>6.2. Клиент обязуется: предоставить достоверные данные, соблюдать условия Оферты и не допускать действий, приводящих к убыткам Банка.</li>
+    </ul>
+
+    <h3>7. Персональные данные</h3>
+    <p>7.1. Клиент даёт согласие на обработку персональных данных, необходимых для исполнения договора, в соответствии с политикой Банка.</p>
+
+    <h3>8. Ответственность и форс-мажор</h3>
+    <p>8.1. Стороны освобождаются от ответственности за ненадлежащее исполнение обязательств в случае форс-мажора при условии надлежащего уведомления.</p>
+
+    <h3>9. Разрешение споров</h3>
+    <p>9.1. Споры разрешаются путём переговоров, при недостижении согласия — в соответствии с законодательством РФ в компетентном суде.</p>
+
+    <h3>10. Заключительные положения</h3>
+    <p>10.1. Оферта действует до её отзыва Банком. Принятие Оферты через интерфейс приравнивается к подписанию договора.</p>
+
+    <hr>
+    <p style="font-size:13px;color:#444;margin-top:8px">MVP: текст носит ознакомительный характер и требует юридической проверки перед использованием в продакшене.</p>
+  `;
+
+  // безопасная вставка ссылки в .bank-name внутри dlgInfo (однократно)
+  function addLinkToDlgInfo() {
+    const bankNameEl = dlgInfo.querySelector('.bank-name');
+    if (!bankNameEl) return;
+    if (bankNameEl.querySelector('.contract-link')) return; // уже есть
+
+    const a = document.createElement('a');
+    a.className = 'contract-link';
+    a.href = '#';
+    a.textContent = 'Договор оферты';
+    a.setAttribute('role', 'button');
+    // inline-стили, чтобы не зависеть от CSS
+    a.style.marginLeft = '10px';
+    a.style.fontSize = '13px';
+    a.style.color = '#0070d2';
+    a.style.textDecoration = 'underline';
+    a.style.cursor = 'pointer';
+    bankNameEl.appendChild(a);
+
+    a.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const cardBank = pendingCard?.dataset?.bank || bankNameEl.textContent || '—';
+      const cardSum  = pendingCard?.dataset?.sum  || dlgInfo.querySelector('[data-field="sum"]')?.textContent || '—';
+      const dlg = ensureContractDialog();
+      const body = dlg.querySelector('.contract-body');
+      body.innerHTML = `<p style="margin:0 0 8px"><strong>Банк:</strong> ${escapeHtml(cardBank)} &nbsp; <strong>Сумма:</strong> ${escapeHtml(cardSum)}</p>` + contractHtmlLong;
+      try { dlg.showModal(); } catch (err) { dlg.removeAttribute('hidden'); }
+      setTimeout(() => body.focus(), 40);
+    });
+  }
+
+  // простая helper-функция
+  function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  // Перехватываем native showModal/show — чтобы добавить ссылку сразу после открытия окна
+  function wrapShow(originalName) {
+    const orig = dlgInfo[originalName];
+    if (typeof orig !== 'function') return;
+    dlgInfo[originalName] = function wrappedShow() {
+      // вызываем оригинал
+      const res = orig.apply(dlgInfo, arguments);
+      // через setTimeout — чтобы openInfo успел заполнить поля (если show вызывается до заполнения)
+      setTimeout(() => {
+        try { addLinkToDlgInfo(); } catch (e) { console.warn('[contract-dlg] addLink failed', e); }
+      }, 8);
+      return res;
+    };
+  }
+  wrapShow('showModal');
+  wrapShow('show');
+
+  // safety: если openInfo не использует show/showModal (редко), подпишемся на mutation: когда dlgInfo станет visible -> добавим ссылку
+  const mo = new MutationObserver((mutations, obs) => {
+    for (const m of mutations) {
+      if (m.attributeName === 'open' || m.type === 'attributes' || m.addedNodes.length) {
+        addLinkToDlgInfo();
+      }
+    }
+  });
+  try { mo.observe(dlgInfo, { attributes: true, childList: true, subtree: false }); } catch(e){ /* ignore */ }
+
+  // initial no-op: если окно уже открыт — добавим ссылку сейчас
+  if ((typeof dlgInfo.open === 'boolean' && dlgInfo.open) || dlgInfo.hasAttribute('open')) {
+    setTimeout(addLinkToDlgInfo, 8);
+  }
+
+})();
+
+
+
+/* =========================
+   Deposits dialog + growth chart
+   Полная замена старым фрагментам графика / диалога вкладов.
+   Вставьте этот блок после определения dlgInfo/pendingCard (в пределах DOMContentLoaded).
+   ========================= */
+
+   (function initDepositsAndChart() {
+    // Находим dlgInfo (используем существующую переменную, если она есть)
+    const dlgElement = (typeof dlgInfo !== 'undefined' && dlgInfo) ? dlgInfo : document.getElementById('dlg-info');
+    if (!dlgElement) {
+      console.warn('[deposits-chart] dlg-info не найден — код пропущен');
+      return;
+    }
+  
+    // --- Утилиты ---
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    function parseRub(str){ if (!str) return 0; return Number(String(str).replace(/[^\d\-\.]/g,'')) || 0; }
+  
+    // --- Сбор данных о депозитах из карточки ---
+    function getDepositsFromCard(card){
+      if (!card) return [];
+      const ds = card.dataset || {};
+  
+      // если есть JSON в dataset.deposits — парсим (формат: [{bank,sum,income,term,end,next,apr},...])
+      if (ds.deposits) {
+        try {
+          const arr = JSON.parse(ds.deposits);
+          if (Array.isArray(arr)) {
+            return arr.map(d => ({
+              bank: d.bank || '—',
+              sum: Number(d.sum) || 0,
+              income: Number(d.income) || 0,
+              term: Number(d.term) || 0,
+              end: d.end || '',
+              next: d.next || '',
+              apr: Number(d.apr) || (d.sum ? (d.income / d.sum) * 100 : 0)
+            }));
+          }
+        } catch (e) { /* не JSON — продолжим fallback */ }
+      }
+  
+      // fallback: создаём один депозит из dataset полей
+      const sum = parseRub(ds.sum || card.getAttribute('data-sum') || '0');
+      const incomeDelta = parseRub(String(ds.incomeDelta || card.getAttribute('data-income-delta') || '0'));
+      // если есть полный income (sum+income) или только delta — обработаем аккуратно
+      let income = parseRub(ds.income || card.getAttribute('data-income') || '0');
+      if (!income && incomeDelta) income = incomeDelta;
+      // если income кажется суммой (total) — переведём в delta: income - sum
+      // (т.к. разные места хранят по-разному)
+      if (income && income > sum) {
+        income = Math.max(0, income - sum);
+      }
+  
+      const maxMatch = (ds.max || card.getAttribute('data-max') || '').match(/\d+/);
+      const term = maxMatch ? Number(maxMatch[0]) : 0;
+  
+      const deposit = {
+        bank: ds.bank || card.getAttribute('data-bank') || '—',
+        sum: sum,
+        income: income,
+        term: term,
+        end: ds.end || card.getAttribute('data-end') || '',
+        next: ds.next || card.getAttribute('data-next') || '',
+        apr: sum > 0 && term > 0 ? (income / sum) * (12 / term) * 100 : (sum > 0 ? (income / sum) * 100 : 0)
+      };
+  
+      return [deposit];
+    }
+  
+    // --- Создание/получение диалога вкладов (один на страницу) ---
+    function ensureDepositsDialog(){
+      let dlg = document.getElementById('dlg-deposits');
+      if (dlg) return dlg;
+      dlg = document.createElement('dialog');
+      dlg.id = 'dlg-deposits';
+      dlg.className = 'dlg dlg-deposits';
+      dlg.innerHTML = `
+        <header class="dlg-header">
+          <p class="bank-name">Текущие вклады</p>
+          <button class="dlg-x" aria-label="Закрыть">×</button>
+        </header>
+        <div class="deposits-body" style="padding:12px;max-height:60vh;overflow:auto"></div>
+        <footer style="display:flex;justify-content:flex-end;gap:8px;padding:12px">
+          <button class="btn dlg-close" type="button">Закрыть</button>
+        </footer>
+      `;
+      document.body.appendChild(dlg);
+      // handlers
+      const btnX = dlg.querySelector('.dlg-x');
+      const btnClose = dlg.querySelector('.dlg-close');
+      const closeFn = () => { try { dlg.close(); } catch(e) { dlg.setAttribute('hidden',''); } };
+      btnX.addEventListener('click', closeFn);
+      btnClose.addEventListener('click', closeFn);
+      dlg.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFn(); });
+      return dlg;
+    }
+  
+    // --- Открыть диалог "Текущие вклады" и заполнить список ---
+    // Замените старую openDepositsFromCard на этот код
+    
+    
+
+  
+    // --- Рисуем красивый area/line chart на canvas (адаптивно) ---
+    function drawGrowthChart(canvas, values) {
+      if (!canvas || !values || !values.length) return;
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const cssW = Math.max(300, Math.floor(rect.width || 400));
+      const cssH = Math.max(140, Math.floor(rect.height || 160));
+  
+      canvas.width = Math.floor(cssW * dpr);
+      canvas.height = Math.floor(cssH * dpr);
+      canvas.style.width = cssW + 'px';
+      canvas.style.height = cssH + 'px';
+  
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0,0,cssW,cssH);
+  
+      // padding (выровнено для подписи слева)
+      const padding = { left: 64, right: 18, top: 12, bottom: 40 };
+      const plotW = cssW - padding.left - padding.right;
+      const plotH = cssH - padding.top - padding.bottom;
+      if (plotW <= 0 || plotH <= 0) return;
+  
+      // безопасный min/max
+      let min = Math.min(...values);
+      let max = Math.max(...values);
+      if (!isFinite(min) || !isFinite(max)) return;
+      if (Math.abs(max - min) < 1) { max = max + 1; min = Math.max(0, min - 1); }
+      if (min > max) { const t=min; min=max; max=t; }
+  
+      // функции координат
+      const pxX = i => padding.left + (i / (values.length - 1)) * plotW;
+      const pxY = v => padding.top + (1 - (v - min) / (max - min)) * plotH;
+  
+      // градиент для фона
+      const grad = ctx.createLinearGradient(0, padding.top, 0, padding.top + plotH);
+      grad.addColorStop(0, 'rgba(11,146,92,0.18)');
+      grad.addColorStop(1, 'rgba(11,146,92,0.02)');
+  
+      // area path (плавно)
+      ctx.beginPath();
+      ctx.moveTo(pxX(0), pxY(values[0]));
+      for (let i=1;i<values.length;i++){
+        const x0 = pxX(i-1), y0 = pxY(values[i-1]);
+        const x1 = pxX(i), y1 = pxY(values[i]);
+        const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+        ctx.quadraticCurveTo(x0, y0, cx, cy);
+      }
+      ctx.lineTo(pxX(values.length-1), padding.top + plotH);
+      ctx.lineTo(pxX(0), padding.top + plotH);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+  
+      // stroke line
+      ctx.beginPath();
+      ctx.moveTo(pxX(0), pxY(values[0]));
+      for (let i=1;i<values.length;i++){
+        const x0 = pxX(i-1), y0 = pxY(values[i-1]);
+        const x1 = pxX(i), y1 = pxY(values[i]);
+        const cx = (x0 + x1)/2, cy = (y0 + y1)/2;
+        ctx.quadraticCurveTo(x0, y0, cx, cy);
+      }
+      ctx.strokeStyle = '#0b925b';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+  
+      // grid & y-labels
+      ctx.strokeStyle = 'rgba(11,18,25,0.06)';
+      ctx.lineWidth = 1;
+      const fontSize = 12;
+      ctx.font = `${fontSize}px system-ui, Arial`;
+      ctx.fillStyle = '#223';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      const steps = 3;
+      for (let s=0;s<=steps;s++){
+        const t = s/steps;
+        const y = padding.top + t*plotH;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(padding.left + plotW, y);
+        ctx.stroke();
+        const valueAt = Math.round((1 - t) * (max - min) + min);
+        ctx.fillText(valueAt.toLocaleString('ru-RU') + ' ₽', padding.left - 10, y);
+      }
+  
+      // x-labels (компактные)
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.font = `11px system-ui, Arial`;
+      const labelCount = 4;
+      const stepI = Math.max(1, Math.floor((values.length - 1) / labelCount));
+      for (let i=0;i<values.length;i+=stepI){
+        ctx.fillText(`${i}м`, pxX(i), padding.top + plotH + 6);
+      }
+  
+      // last point highlight
+      const lastX = pxX(values.length-1), lastY = pxY(values[values.length-1]);
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 4, 0, Math.PI*2);
+      ctx.fillStyle = '#0b925b';
+      ctx.fill();
+    }
+  
+    // --- Рендер графика при открытии dlgInfo ---
+    function renderChartForDlgInfo() {
+      // находим canvas (если нет — создаём секцию раньше)
+      let canvas = dlgElement.querySelector('#growthChartCanvas');
+      if (!canvas) {
+        // создаём блок и canvas; вставляем между .tg-achv и metrics-grid (если есть)
+        const wrap = document.createElement('div');
+        wrap.className = 'growth-chart-wrap';
+        wrap.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-weight:700">График роста средств</div>
+            <div style="font-size:13px;color:#666">Прогноз на основе текущих вкладов</div>
+          </div>
+          <canvas id="growthChartCanvas" aria-label="График роста средств" style="width:80%;height:160px;display:block"></canvas>
+        `;
+        const target = dlgElement.querySelector('.tg-achv');
+        if (target && target.parentNode) target.parentNode.insertBefore(wrap, target.nextSibling);
+        else dlgElement.appendChild(wrap);
+        canvas = dlgElement.querySelector('#growthChartCanvas');
+      }
+  
+      // собираем series (24 мес) по deposits
+      const card = window.pendingCard || (function(){
+        const fake = document.createElement('div');
+        fake.dataset = {};
+        fake.dataset.sum = dlgElement.querySelector('[data-field="sum"]')?.textContent || '0';
+        fake.dataset.income = dlgElement.querySelector('[data-field="income"]')?.textContent || '0';
+        fake.dataset.max = dlgElement.querySelector('[data-field="max"]')?.textContent || '';
+        return fake;
+      })();
+  
+      const deposits = (function(){
+        try {
+          if (card.dataset && card.dataset.deposits) {
+            const parsed = JSON.parse(card.dataset.deposits);
+            if (Array.isArray(parsed)) return parsed.map(d=>({ sum:Number(d.sum)||0, apr:Number(d.apr)||0 }));
+          }
+        } catch(e){}
+        // fallback: one deposit
+        const s = parseRub(card.dataset.sum || '0');
+        const inc = parseRub(card.dataset.income || '0');
+        const term = Number((card.dataset.max||'').match(/\d+/)?.[0] || 0);
+        const apr = s>0 && term>0 ? (inc / s) * (12 / Math.max(1, term)) * 100 : (s>0 ? (inc / s) * 100 : 0);
+        return [{ sum: s, apr: apr }];
+      })();
+  
+      const months = 24;
+      const series = new Array(months+1).fill(0);
+      const base = deposits.reduce((a,b)=>a + (b.sum||0),0);
+      series[0] = base;
+      const blendedApr = deposits.reduce((acc,d)=>acc + ((d.apr||0)*(d.sum||0)),0) / Math.max(base,1);
+      for (let m=1;m<=months;m++){
+        const prev = series[m-1];
+        const growth = prev * (blendedApr/100) / 12;
+        series[m] = prev + growth;
+      }
+  
+      drawGrowthChart(canvas, series);
+    }
+  
+    // --- Открытие диалога вкладов по клику на метрику "Текущих вкладов" ---
+    function bindCountMetric() {
+      const countSpan = dlgElement.querySelector('[data-field="count"]');
+      if (!countSpan) return;
+      const metric = countSpan.closest('.metric') || countSpan.parentElement;
+      if (!metric) return;
+      
+      // if (metric.dataset._depositsBound === '1') return;
+      
+      // metric.dataset._depositsBound = '1';
+      metric.style.cursor = 'pointer';
+      metric.tabIndex = metric.tabIndex || 0;
+      
+      // metric.addEventListener('keydown', (e)=>{ if (e.key === 'Enter' || e.key===' ') { e.preventDefault(); metric.click(); } });
+    }
+  
+    // --- Hook: при открытии dlgInfo рендерим график (оборачиваем showModal/show) ---
+    function wrapDlgShowToRender() {
+      ['showModal','show'].forEach(fn => {
+        if (typeof dlgElement[fn] === 'function' && !dlgElement[fn]._wrappedForChart) {
+          const orig = dlgElement[fn].bind(dlgElement);
+          dlgElement[fn] = function wrappedShow() {
+            const res = orig();
+            // рендерим через небольшую задержку, чтобы openInfo успел заполнить данные
+            setTimeout(renderChartForDlgInfo, 30);
+            return res;
+          };
+          dlgElement[fn]._wrappedForChart = true;
+        }
+      });
+    }
+  
+    // --- Инициализация ---
+    wrapDlgShowToRender();
+    bindCountMetric();
+  
+    // Если dlgInfo уже открыт — отрендерим график сейчас
+    if ((typeof dlgElement.open === 'boolean' && dlgElement.open) || dlgElement.hasAttribute && dlgElement.hasAttribute('open')) {
+      setTimeout(renderChartForDlgInfo, 30);
+    }
+  
+    // Экспорт в window для быстрой отладки (опционально)
+    window.__renderChartForDlgInfo = renderChartForDlgInfo;
+  
+  })();
+  
 
 }); 

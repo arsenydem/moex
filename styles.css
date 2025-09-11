@@ -1539,6 +1539,7 @@ aside.right{
   display: flex;
   align-items: center;
   justify-content: space-between;
+  text-align: left;
   gap: 12px;
   width: 100%;
   padding: 10px 14px;
@@ -1728,4 +1729,106 @@ aside.right{
 .btn[disabled] {
   opacity: 0.6;
   pointer-events: none;
+}
+
+
+/* фикс расположения выпадающих меню при опросе */
+.custom-select .ms-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;             
+  max-height: 240px;     
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  z-index: 3000;         
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+
+
+@media (max-width: 600px) {
+  .custom-select .ms-list {
+    position: fixed;
+    left: 5%;
+    right: 5%;
+    width: 90%;
+    top: auto;
+    bottom: 10%;          
+    max-height: 50vh;
+  }
+}
+
+
+
+/* договор рядом с именем банка */
+.card .contract-link-card {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #0070d2;
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(0,112,210,0.5);
+  cursor: pointer;
+}
+.card .contract-link-card:hover,
+.card .contract-link-card:focus {
+  text-decoration: underline;
+}
+
+/* небольшой стиль для модалки договора */
+#dlg-contract { width: min(760px, 90vw); }
+#dlg-contract .contract-body { max-height: 60vh; overflow:auto; padding-right:8px; font-size:13px; line-height:1.45; }
+
+
+/* ===== доработка "текущих вкладов" ===== */
+.dlg-deposits .deposit-item {
+  display:flex;
+  gap:14px;
+  padding:12px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#fff,#fbfbfd);
+  align-items:center;
+  box-shadow: 0 6px 18px rgba(18,25,40,0.06);
+  margin-bottom:10px;
+}
+.dlg-deposits .deposit-item .left {
+  width:140px;
+  flex-shrink:0;
+}
+.dlg-deposits .deposit-item .left .bank {
+  font-weight:700;
+  font-size:15px;
+  margin-bottom:6px;
+}
+.dlg-deposits .deposit-item .left .term {
+  font-size:13px;
+  color:#666;
+}
+.dlg-deposits .deposit-item .right {
+  flex:1;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.dlg-deposits .deposit-amount { font-weight:700; font-size:18px; }
+.dlg-deposits .deposit-yield { text-align:right; color:#0b925b; font-weight:700; }
+.dlg-deposits .deposit-meta { color:#666; font-size:13px; text-align:right; }
+
+/* ===== Chart in dlg-info ===== */
+.dlg-info .growth-chart-wrap {
+  margin: 12px 0 6px;
+  padding: 12px;
+  background: linear-gradient(180deg,#ffffff,#f7f9fb);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(11,18,25,0.04);
+}
+.dlg-info .growth-chart-wrap canvas {
+  width:100%;
+  height:160px; /* визуальная высота */
+  display:block;
+}
+@media(min-width:900px){
+  .dlg-info .growth-chart-wrap canvas { height:220px; }
 }
